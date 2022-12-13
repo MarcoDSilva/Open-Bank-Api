@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "JjrF29XBbRLtdDqefyy3EOOBoBiDoZRm1+ETH6QUtqk=",
+  "Source": "OpenBank.API",
+  "BasePath": "_content/OpenBank.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
