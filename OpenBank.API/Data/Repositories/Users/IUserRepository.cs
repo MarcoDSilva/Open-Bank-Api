@@ -4,6 +4,8 @@ namespace OpenBank.API.Data;
 
 public interface IUserRepository
 {
-    CreateUserRequest CreateUser(CreateUserRequest createUserRequest);
+    Task<CreateUserRequest> CreateUser(CreateUserRequest createUserRequest);
+    bool IsUsernameAvailable(string username);
+    IEnumerable<User> GetAllUsers(); // high chance this needs a DTO
 }
 

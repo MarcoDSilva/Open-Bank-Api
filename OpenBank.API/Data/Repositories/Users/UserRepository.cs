@@ -1,4 +1,8 @@
+using System.Collections;
 using System.ComponentModel;
+using System.Data.Entity;
+using System.Net.Mail;
+using Microsoft.EntityFrameworkCore;
 using OpenBank.Api.Data;
 using OpenBank.API.Models.Entities;
 
@@ -13,7 +17,7 @@ public class UserRepository : IUserRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    public CreateUserRequest CreateUser(CreateUserRequest createUserRequest)
+    public async Task<CreateUserRequest> CreateUser(CreateUserRequest createUserRequest)
     {
         var requestToUser = new User()
         {
@@ -23,9 +27,37 @@ public class UserRepository : IUserRepository
             UserName = createUserRequest.Username
         };
 
-        //var inserted = _openBankApiDbContext.Users.Add(requestToUser);
-        return createUserRequest;        
-        //return inserted.IsKeySet == true ? createUserRequest : new CreateUserRequest();
+        try
+        {
+            var inserted = await _openBankApiDbContext.Users.AddAsync(requestToUser);
+            var save = await _openBankApiDbContext.SaveChangesAsync();
+
+            return createUserRequest;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error {0}", e.Message); //Log erro
+            throw new Exception("Error while creating the user");
+        }
     }
+        
+    public IEnumerable<User> GetAllUsers()
+    {
+        var userList = _openBankApiDbContext.Users.ToList();
+        return userList;
+    }
+
+    /// <summary>
+    /// Validating the existance of the username that is being inserted
+    /// </summary>
+    /// <returns> true if the username is free
+    public bool IsUsernameAvailable(string username)
+    {
+        var userList = _openBankApiDbContext.Users.ToList();
+        var exists = userList.Find(m => m.UserName.Equals(username));
+
+        return string.IsNullOrEmpty(exists?.UserName);
+    }
+
 }
 

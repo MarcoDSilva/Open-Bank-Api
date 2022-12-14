@@ -13,15 +13,36 @@ public class UsersController : ControllerBase
     public UsersController(IUserRepository userRepository)
     {
         _userRepository = userRepository;
-    }    
+    }
+
+    // call to verify the connection with the db
+    [HttpGet]
+    [Route("users")]
+    public IActionResult Users()
+    {
+        var users = _userRepository.GetAllUsers();
+        return Ok(users);
+    }
 
     [HttpPost]
     [Route("users")]
     public IActionResult Users(CreateUserRequest createUser)
     {
-        var result = _userRepository.CreateUser(createUser);
-        // método de validação aqui e retornar dependente do resultado
-        return Ok(result);        
+        var usernameAvailable = _userRepository.IsUsernameAvailable(createUser.Username);
+        if (!usernameAvailable)
+        {
+            return BadRequest($"Username {createUser.Username} already in use, please register with a different username.");
+        }
+
+        try
+        {
+            var result = _userRepository.CreateUser(createUser);
+            return Ok(result.Result);
+        }
+        catch (Exception e)
+        {
+            return Problem(e.Message);
+        }
     }
 
     [HttpPost]

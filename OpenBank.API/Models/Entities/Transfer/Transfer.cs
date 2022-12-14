@@ -8,7 +8,7 @@ public class Transfer
     public int Id {get; set;}
 
     [Required]
-    [Range(0.0, Double.MaxValue, ErrorMessage = "The field {0} must be greater than {1}.")]
+    [Range(1.0, Double.MaxValue, ErrorMessage = "The field {0} must be greater than {1}.")]
     public decimal Amount { get; set; }
 
     [Required]

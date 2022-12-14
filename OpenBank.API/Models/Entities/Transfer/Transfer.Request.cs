@@ -5,15 +5,15 @@ namespace OpenBank.API.Models.Entities;
 public class TransferRequest
 {
     [Required]
-    [Range(0.0, Double.MaxValue, ErrorMessage = "The field {0} must be greater than {1}.")]
+    [Range(1.0, Double.MaxValue, ErrorMessage = "The field {0} must be greater than {1}.")]
     public decimal Amount { get; set; }
     
     [Required]
-    [Range(0, int.MaxValue, ErrorMessage = "The number account must be greater than 0.")]
+    [Range(1, int.MaxValue, ErrorMessage = "The number account must be greater than 0.")]
     public int From_account { get; set; }
     
     [Required]
-    [Range(0, int.MaxValue, ErrorMessage = "The number account must be greater than 0.")]
+    [Range(1, int.MaxValue, ErrorMessage = "The number account must be greater than 0.")]
     public int To_account { get; set; }
     
     [Required]
