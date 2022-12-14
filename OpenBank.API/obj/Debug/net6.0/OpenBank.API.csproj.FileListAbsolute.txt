@@ -60,3 +60,10 @@ C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBa
 C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBank.API\obj\Debug\net6.0\OpenBank.API.pdb
 C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBank.API\obj\Debug\net6.0\OpenBank.API.genruntimeconfig.cache
 C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBank.API\obj\Debug\net6.0\ref\OpenBank.API.dll
+C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBank.API\bin\Debug\net6.0\Humanizer.dll
+C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBank.API\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Design.dll
+C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBank.API\bin\Debug\net6.0\Microsoft.Extensions.DependencyModel.dll
+C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBank.API\bin\Debug\net6.0\Mono.TextTemplating.dll
+C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBank.API\bin\Debug\net6.0\System.Text.Encodings.Web.dll
+C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBank.API\bin\Debug\net6.0\System.Text.Json.dll
+C:\Users\mandresi\OneDrive - NTT DATA EMEAL\Escritorio\Formacoes\OpenBank\OpenBank.API\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll

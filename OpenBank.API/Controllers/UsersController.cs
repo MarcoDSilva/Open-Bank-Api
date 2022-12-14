@@ -20,7 +20,7 @@ public class UsersController : ControllerBase
     public IActionResult Users(CreateUserRequest createUser)
     {
         var result = _userRepository.CreateUser(createUser);
-
+        // método de validação aqui e retornar dependente do resultado
         return Ok(result);        
     }
 
