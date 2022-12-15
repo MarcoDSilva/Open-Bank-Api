@@ -15,16 +15,6 @@ public class AccountsController : ControllerBase
         _unitOfWork = unitOfWork;
     }
 
-    /// <summary>
-    /// Get all the accounts
-    /// </summary>
-    [HttpGet]
-    public IActionResult Accounts()
-    {
-        return Ok();
-    }
-
-
     /* CONTROL TEST to validate the logic and cruds. Real one will use a token */
     // [HttpGet]
     // [Route("accounts")]
@@ -40,7 +30,7 @@ public class AccountsController : ControllerBase
         // validar campos vazios
         if (idUser <= 0)
         {
-            return Problem("ID tem de ser um número válido acima de 0");
+            return Problem("ID must be a number higher than 0");
         }
 
         try
@@ -67,23 +57,23 @@ public class AccountsController : ControllerBase
     // }
 
     [HttpGet]
-    [Route("{id}")]
     /// <summary>
-    /// Get X account
+    /// WARNING: This is the regular Accounts() Controller, which will use the Token to validate the user and then
+    /// show all the associated accounts
     /// </summary>
     public IActionResult Accounts(int id)
     {
         // validar campos vazios
         if (id <= 0)
         {
-            return Problem("id tem de ser um número válido acima de 0");
+            return Problem("id must be higher than 0");
         }
 
         try
         {
-            var result = _unitOfWork.accountRepository.GetAccountById(id);
+            var result = _unitOfWork.accountRepository.GetAccounts(id);
 
-            if (result.Result == null) return NotFound();
+            if (result.Result == null || result.Result.Count == 0) return NotFound();
 
             return Ok(result.Result);
         }
@@ -91,5 +81,16 @@ public class AccountsController : ControllerBase
         {
             return Problem(e.Message);
         }
+    }
+
+
+    [HttpGet]
+    [Route("{id}")]
+    /// <summary>
+    /// Get X account
+    /// </summary>
+    public IActionResult Accounts(int id, string permission) // remover ambos os params por um token
+    {
+        return NotFound();
     }
 }

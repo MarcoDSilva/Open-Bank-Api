@@ -15,11 +15,6 @@ public class AccountRepository : IAccountRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    public Task<CreateAccountRequest> CreateAccount(CreateAccountRequest createAccount)
-    {
-        throw new NotImplementedException();
-    }
-
     /* Control test*/
     public async Task<CreateAccountRequest> CreateAccount(int idUser, CreateAccountRequest createAccount)
     {
@@ -48,12 +43,34 @@ public class AccountRepository : IAccountRepository
     public async Task<Account> GetAccountById(int accountId)
     {
         var accountList = await _openBankApiDbContext.Accounts.ToListAsync();
-        var account = accountList.Find(acc => acc.Id == accountId);
 
-        return account;
+        try
+        {
+            var account = accountList.Find(acc => acc.Id == accountId);
+
+            return account;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error {0}", e.Message); //Log erro
+            throw new Exception("Error while obtaining the movements of the account");
+        }
     }
-    public Task<List<Account>> GetAccounts(int userId)
+    public async Task<List<Account>> GetAccounts(int userId)
     {
+        var existantAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
+        try
+        {
+            var accounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList();
+
+            return accounts;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error {0}", e.Message); //Log erro
+            throw new Exception("Error while obtaining the accounts");
+        }
+
         throw new NotImplementedException();
     }
 
