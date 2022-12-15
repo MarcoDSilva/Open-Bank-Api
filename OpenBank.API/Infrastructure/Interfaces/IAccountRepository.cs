@@ -1,6 +1,9 @@
-using OpenBank.API.Models.Entities;
+using OpenBank.API.DTO;
 
-namespace OpenBank.API.Data;
+
+using OpenBank.API.Domain.Entities;
+
+namespace OpenBank.API.Infrastructure.Interfaces;
 
 public interface IAccountRepository
 {

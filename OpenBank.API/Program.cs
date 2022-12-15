@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OpenBank.Api.Data;
-using OpenBank.API.Data;
+using OpenBank.API.Infrastructure.Interfaces;
+using OpenBank.API.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

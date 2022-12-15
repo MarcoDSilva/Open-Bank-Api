@@ -1,7 +1,9 @@
 using OpenBank.Api.Data;
-using OpenBank.API.Models.Entities;
+using OpenBank.API.DTO;
+using OpenBank.API.Domain.Entities;
+using OpenBank.API.Infrastructure.Interfaces;
 
-namespace OpenBank.API.Data;
+namespace OpenBank.API.Infrastructure.Repositories;
 
 public class UserRepository : IUserRepository
 {

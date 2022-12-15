@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using OpenBank.API.Data;
-using OpenBank.API.Models.Entities;
+using OpenBank.API.Infrastructure.Interfaces;
+using OpenBank.API.DTO;
 
 namespace OpenBank.API.Controllers;
 
 [ApiController]
-[Route("api/")]
+[Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
@@ -17,7 +17,6 @@ public class UsersController : ControllerBase
 
     // call to verify the connection with the db
     [HttpGet]
-    [Route("users")]
     public IActionResult Users()
     {
         var users = _userRepository.GetAllUsers();
@@ -25,7 +24,6 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    [Route("users")]
     public IActionResult Users(CreateUserRequest createUser)
     {
         // validar campos vazios
@@ -47,8 +45,7 @@ public class UsersController : ControllerBase
         }
     }
 
-    [HttpPost]
-    [Route("users/login")]
+    [HttpPost("login")]
     public IActionResult Login(LoginUserRequest loginRequest)
     {
         return Ok();

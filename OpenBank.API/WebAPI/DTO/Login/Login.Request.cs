@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OpenBank.API.Models.Entities;
+namespace OpenBank.API.DTO;
+
 
 public class LoginUserRequest
 {

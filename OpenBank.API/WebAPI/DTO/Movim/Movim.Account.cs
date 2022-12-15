@@ -1,4 +1,6 @@
-namespace OpenBank.API.Models.Entities;
+namespace OpenBank.API.DTO;
+
+using OpenBank.API.Domain.Entities;
 
 public class AccountMovim
 {

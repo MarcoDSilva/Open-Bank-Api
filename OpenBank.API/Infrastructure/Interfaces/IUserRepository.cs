@@ -1,7 +1,7 @@
-using OpenBank.API.Models.Entities;
+using OpenBank.API.DTO;
+using OpenBank.API.Domain.Entities;
 
-namespace OpenBank.API.Data;
-
+namespace OpenBank.API.Infrastructure.Interfaces;
 public interface IUserRepository
 {
     Task<CreateUserRequest> CreateUser(CreateUserRequest createUserRequest);

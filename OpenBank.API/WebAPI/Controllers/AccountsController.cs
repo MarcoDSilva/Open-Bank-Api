@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using OpenBank.API.Data;
-using OpenBank.API.Models.Entities;
+using OpenBank.API.Infrastructure.Interfaces;
+using OpenBank.API.DTO;
 
 namespace OpenBank.API.Controllers;
 
 [ApiController]
-[Route("api/")]
+[Route("api/[controller]")]
 public class AccountsController : ControllerBase
 {
     private readonly IAccountRepository _accountRepository;
@@ -19,7 +19,6 @@ public class AccountsController : ControllerBase
     /// Get all the accounts
     /// </summary>
     [HttpGet]
-    [Route("accounts")]
     public IActionResult Accounts()
     {
         return Ok();
@@ -36,7 +35,6 @@ public class AccountsController : ControllerBase
 
     /* CONTROL TEST to validate the logic and cruds. Real one will use a token */
     [HttpPost]
-    [Route("accounts")]
     public IActionResult Accounts(int idUser, CreateAccountRequest accountRequest)
     {
         // validar campos vazios
@@ -69,7 +67,7 @@ public class AccountsController : ControllerBase
     // }
 
     [HttpGet]
-    [Route("accounts/{id}")]
+    [Route("{id}")]
     /// <summary>
     /// Get X account
     /// </summary>

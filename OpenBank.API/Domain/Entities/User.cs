@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OpenBank.API.Models.Entities;
+namespace OpenBank.API.Domain.Entities;
 
 public class User
 {
@@ -22,4 +22,6 @@ public class User
     [Required]
     [StringLength(50)]
     public string UserName { get; set; }
+
+    //  public DateTime CreatedAt { get; set; }
 }

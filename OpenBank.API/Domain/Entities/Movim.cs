@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace OpenBank.API.Models.Entities;
+namespace OpenBank.API.Domain.Entities;
 
 public class Movim
 {

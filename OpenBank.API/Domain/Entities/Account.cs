@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace OpenBank.API.Models.Entities;
+namespace OpenBank.API.Domain.Entities;
 
 public class Account
 {

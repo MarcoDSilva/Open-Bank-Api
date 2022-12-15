@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
-using OpenBank.API.Models.Entities;
+using OpenBank.API.DTO;
+
+
 
 namespace OpenBank.API.Controllers;
 
 [ApiController]
-[Route("api/")]
+[Route("api/[controller]")]
 public class TransfersController : ControllerBase
 {
 
     [HttpPost]
-    [Route("transfers")]
     public IActionResult Transfers(TransferRequest transferRequest)
     {
         return Ok();
