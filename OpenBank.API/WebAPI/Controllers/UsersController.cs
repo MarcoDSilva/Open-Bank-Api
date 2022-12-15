@@ -8,18 +8,18 @@ namespace OpenBank.API.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UsersController(IUserRepository userRepository)
+    public UsersController(IUnitOfWork unitOfWork)
     {
-        _userRepository = userRepository;
+        _unitOfWork = unitOfWork;
     }
 
     // call to verify the connection with the db
     [HttpGet]
     public IActionResult Users()
     {
-        var users = _userRepository.GetAllUsers();
+        var users = _unitOfWork.userRepository.GetAllUsers();
         return Ok(users);
     }
 
@@ -28,7 +28,7 @@ public class UsersController : ControllerBase
     {
         // validar campos vazios
 
-        var usernameAvailable = _userRepository.IsUsernameAvailable(createUser.Username);
+        var usernameAvailable = _unitOfWork.userRepository.IsUsernameAvailable(createUser.Username);
         if (!usernameAvailable)
         {
             return BadRequest($"Username {createUser.Username} already in use, please register with a different username.");
@@ -36,7 +36,7 @@ public class UsersController : ControllerBase
 
         try
         {
-            var result = _userRepository.CreateUser(createUser);
+            var result = _unitOfWork.userRepository.CreateUser(createUser);
             return Ok(result.Result);
         }
         catch (Exception e)

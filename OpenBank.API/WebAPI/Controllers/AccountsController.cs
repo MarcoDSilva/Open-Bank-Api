@@ -8,11 +8,11 @@ namespace OpenBank.API.Controllers;
 [Route("api/[controller]")]
 public class AccountsController : ControllerBase
 {
-    private readonly IAccountRepository _accountRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AccountsController(IAccountRepository accountRepository)
+    public AccountsController(IUnitOfWork unitOfWork)
     {
-        _accountRepository = accountRepository;
+        _unitOfWork = unitOfWork;
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class AccountsController : ControllerBase
 
         try
         {
-            var result = _accountRepository.CreateAccount(idUser, accountRequest);
+            var result = _unitOfWork.accountRepository.CreateAccount(idUser, accountRequest);
             return Ok(result.Result);
         }
         catch (Exception e)
@@ -81,7 +81,7 @@ public class AccountsController : ControllerBase
 
         try
         {
-            var result = _accountRepository.GetAccountById(id);
+            var result = _unitOfWork.accountRepository.GetAccountById(id);
 
             if (result.Result == null) return NotFound();
 

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OpenBank.Api.Data;
+using OpenBank.API.Infrastructure;
 using OpenBank.API.Infrastructure.Interfaces;
 using OpenBank.API.Infrastructure.Repositories;
 
@@ -19,6 +20,8 @@ builder.Services.AddDbContext<OpenBankApiDbContext>(options =>
 });
 
 // registering repositories
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
