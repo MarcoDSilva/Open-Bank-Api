@@ -452,3 +452,10 @@ $RECYCLE.BIN/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+#ignore bin directory 
+bin/
+obj/
+
+#ignore any files with .obj postfix 
+*.obj 	
