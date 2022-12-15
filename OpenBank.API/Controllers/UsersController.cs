@@ -28,6 +28,8 @@ public class UsersController : ControllerBase
     [Route("users")]
     public IActionResult Users(CreateUserRequest createUser)
     {
+        // validar campos vazios
+
         var usernameAvailable = _userRepository.IsUsernameAvailable(createUser.Username);
         if (!usernameAvailable)
         {

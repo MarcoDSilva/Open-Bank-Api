@@ -1,8 +1,3 @@
-using System.Collections;
-using System.ComponentModel;
-using System.Data.Entity;
-using System.Net.Mail;
-using Microsoft.EntityFrameworkCore;
 using OpenBank.Api.Data;
 using OpenBank.API.Models.Entities;
 

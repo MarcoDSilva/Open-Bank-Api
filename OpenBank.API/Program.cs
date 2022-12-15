@@ -19,6 +19,7 @@ builder.Services.AddDbContext<OpenBankApiDbContext>(options =>
 
 // registering repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 var app = builder.Build();
 
