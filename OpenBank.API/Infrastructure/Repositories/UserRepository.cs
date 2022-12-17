@@ -69,7 +69,7 @@ public class UserRepository : IUserRepository
 
             if (string.IsNullOrWhiteSpace(existentUser?.UserName)) return false;
 
-            var pwHasher = new PasswordHasher<string>();
+            PasswordHasher<string> pwHasher = new PasswordHasher<string>();
             int validUser = (int)pwHasher.VerifyHashedPassword(
                                     login.UserName, existentUser.Password, login.Password
                                 );
@@ -78,7 +78,7 @@ public class UserRepository : IUserRepository
         }
         catch (Exception e)
         {
-            throw new Exception("Server issues");
+            throw new Exception($"Server issues: {e.Message}" );
         }
     }
 

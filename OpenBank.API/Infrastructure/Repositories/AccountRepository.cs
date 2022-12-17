@@ -18,7 +18,7 @@ public class AccountRepository : IAccountRepository
     /* Control test*/
     public async Task<CreateAccountRequest> CreateAccount(int idUser, CreateAccountRequest createAccount)
     {
-        var account = new Account()
+        Account account = new Account()
         {
             Balance = createAccount.Amount,
             Created_at = DateTime.UtcNow,
