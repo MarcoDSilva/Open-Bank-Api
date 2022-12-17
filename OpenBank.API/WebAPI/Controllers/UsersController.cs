@@ -19,7 +19,11 @@ public class UsersController : ControllerBase
     [HttpGet]
     public IActionResult Users()
     {
-        var users = _unitOfWork.userRepository.GetAllUsers();
+        var users = _unitOfWork.userRepository.GetAllUsers().ToList();
+
+        if ((int)users.Count <= 0)
+            return NotFound("Error 404: There are no users registered");
+
         return Ok(users);
     }
 
@@ -48,6 +52,22 @@ public class UsersController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login(LoginUserRequest loginRequest)
     {
-        return Ok();
+        try
+        {
+            bool loginValid = _unitOfWork.userRepository.IsLoginValid(loginRequest);
+
+            if (!loginValid)
+            {
+                return Unauthorized("Login or username incorrect!");
+            }
+
+            return Ok(loginRequest.UserName);
+        }
+        catch (Exception e)
+        {
+            return Problem(e.Message);
+        }
+
+
     }
 }

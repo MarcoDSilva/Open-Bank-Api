@@ -70,8 +70,6 @@ public class AccountRepository : IAccountRepository
             Console.WriteLine("Error {0}", e.Message); //Log erro
             throw new Exception("Error while obtaining the accounts");
         }
-
-        throw new NotImplementedException();
     }
 
 }

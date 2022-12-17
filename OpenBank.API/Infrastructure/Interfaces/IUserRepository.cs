@@ -6,6 +6,7 @@ public interface IUserRepository
 {
     Task<CreateUserRequest> CreateUser(CreateUserRequest createUserRequest);
     bool IsUsernameAvailable(string username);
+    bool IsLoginValid(LoginUserRequest login);
     IEnumerable<User> GetAllUsers(); // high chance this needs a DTO
 }
 

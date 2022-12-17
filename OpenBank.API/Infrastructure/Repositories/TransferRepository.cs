@@ -14,4 +14,9 @@ public class TransferRepository : ITransferRepository
     {
         _openBankApiDbContext = openBankApiDbContext;
     }
+
+    public Task<TransferRequest> TransferRequest(TransferRequest transfer)
+    {
+        throw new NotImplementedException();
+    }
 }
