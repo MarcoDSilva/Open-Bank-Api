@@ -17,9 +17,9 @@ public class UserRepository : IUserRepository
 
     public async Task<CreateUserRequest> CreateUser(CreateUserRequest createUserRequest)
     {
-        var pwHasher = new PasswordHasher<string>();
+        PasswordHasher<string> pwHasher = new PasswordHasher<string>();
 
-        var requestToUser = new User()
+        User requestToUser = new User()
         {
             Email = createUserRequest.Email,
             FullName = createUserRequest.FullName,

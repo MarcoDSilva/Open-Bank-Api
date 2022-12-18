@@ -32,7 +32,7 @@ public class UsersController : ControllerBase
     {
         // validar campos vazios
 
-        var usernameAvailable = _unitOfWork.userRepository.IsUsernameAvailable(createUser.Username);
+        bool usernameAvailable = _unitOfWork.userRepository.IsUsernameAvailable(createUser.Username);
         if (!usernameAvailable)
         {
             return BadRequest($"Username {createUser.Username} already in use, please register with a different username.");
