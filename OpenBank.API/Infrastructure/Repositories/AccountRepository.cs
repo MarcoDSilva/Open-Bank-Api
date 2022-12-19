@@ -81,10 +81,24 @@ public class AccountRepository : IAccountRepository
         try
         {
             var movements = existantMovements.FindAll(mov => mov.AccountId == account.Id).ToList();
+
+            List<MovimResponse> movementsToDTO = new List<MovimResponse>();
+
+            foreach (Movim movement in movements)
+            {
+                movementsToDTO.Add(new MovimResponse()
+                {
+                    Id = movement.Id,
+                    Amount = movement.Balance,
+                    Created_at = movement.Created_at,
+                    OperationType = movement.OperationType
+                });
+            }
+
             AccountMovim accountMovim = new AccountMovim()
             {
                 Account = account,
-                Movimentos = movements
+                Movimentos = movementsToDTO,
             };
 
             return accountMovim;

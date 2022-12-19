@@ -86,15 +86,15 @@ public class AccountsController : ControllerBase
             Account account = await _unitOfWork.accountRepository.GetAccountById(id);
 
             if (account is null)
-                return Ok("There is no account with this ID");
+                return NotFound("There is no account with this ID");
 
-            return Ok(account);
+            AccountMovim accountWithMovements = await _unitOfWork.accountRepository.GetAccountMovements(account);
+
+            return Ok(accountWithMovements);
         }
         catch (Exception e)
         {
             return Problem(e.Message);
         }
-
-        //return NotFound();
     }
 }
