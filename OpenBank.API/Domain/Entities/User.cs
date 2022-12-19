@@ -23,5 +23,6 @@ public class User
     [StringLength(50)]
     public string UserName { get; set; }
 
-    //  public DateTime CreatedAt { get; set; }
+    [Required]
+    public DateTime CreatedAt { get; set; }
 }

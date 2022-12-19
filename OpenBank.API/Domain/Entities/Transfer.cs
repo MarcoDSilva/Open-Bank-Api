@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OpenBank.API.Domain.Entities;
 
 public class Transfer
 {
     [Key]
-    public int Id {get; set;}
+    public int Id { get; set; }
 
     [Required]
     [Range(1.0, Double.MaxValue, ErrorMessage = "The field {0} must be greater than {1}.")]
@@ -16,4 +17,6 @@ public class Transfer
 
     [Required]
     public int To_account { get; set; }
+
+    public DateTime CreatedAt { get; set; }
 }

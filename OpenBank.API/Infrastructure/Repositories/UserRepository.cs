@@ -24,7 +24,8 @@ public class UserRepository : IUserRepository
             Email = createUserRequest.Email,
             FullName = createUserRequest.FullName,
             Password = pwHasher.HashPassword(createUserRequest.Username, createUserRequest.Password),
-            UserName = createUserRequest.Username
+            UserName = createUserRequest.Username,
+            CreatedAt = DateTime.UtcNow
         };
 
         try
