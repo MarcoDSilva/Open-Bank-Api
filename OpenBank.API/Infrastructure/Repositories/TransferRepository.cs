@@ -17,14 +17,14 @@ public class TransferRepository : ITransferRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    public async Task<(StatusCode, string)> TransferRequest(TransferRequest transfer)
+    public async Task<(StatusCode, string)> TransferRequestAsync(TransferRequest transfer)
     {
         var accountsList = await _openBankApiDbContext.Accounts.ToListAsync();
         Account? accountFrom = accountsList.Find(acc => acc.Id == transfer.From_account);
         Account? accountTo = accountsList.Find(acc => acc.Id == transfer.To_account);
 
         // validation
-        var validation = ValidateAccountsForTransfer(accountFrom, accountTo, transfer);
+        (StatusCode, string) validation = ValidateAccountsForTransfer(accountFrom, accountTo, transfer);
         if (validation.Item1 != StatusCode.Sucess)
         {
             return validation;
@@ -38,7 +38,7 @@ public class TransferRepository : ITransferRepository
         Movim accountFromMovement = new Movim()
         {
             Account = accountFrom,
-            Balance = transfer.Amount,
+            Amount = transfer.Amount,
             Created_at = DateTime.UtcNow,
             OperationType = TypeOfMovement.Debit
         };
@@ -46,7 +46,7 @@ public class TransferRepository : ITransferRepository
         Movim accountToMovement = new Movim()
         {
             Account = accountTo,
-            Balance = transfer.Amount,
+            Amount = transfer.Amount,
             Created_at = DateTime.UtcNow,
             OperationType = TypeOfMovement.Credit
         };
@@ -55,8 +55,8 @@ public class TransferRepository : ITransferRepository
         {
             _openBankApiDbContext.Accounts.Update(accountFrom);
             _openBankApiDbContext.Accounts.Update(accountTo);
-            _openBankApiDbContext.Movim.Add(accountFromMovement);
-            _openBankApiDbContext.Movim.Add(accountToMovement);
+            await _openBankApiDbContext.Movim.AddAsync(accountFromMovement);
+            await _openBankApiDbContext.Movim.AddAsync(accountToMovement);
 
             var result = await _openBankApiDbContext.SaveChangesAsync();
 

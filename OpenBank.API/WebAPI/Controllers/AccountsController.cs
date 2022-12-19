@@ -1,4 +1,3 @@
-using Swashbuckle.AspNetCore.SwaggerUI;
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Infrastructure.Interfaces;
 using OpenBank.API.DTO;

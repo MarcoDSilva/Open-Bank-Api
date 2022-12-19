@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.DTO;
 using OpenBank.API.Infrastructure.Interfaces;
@@ -6,6 +7,7 @@ namespace OpenBank.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TransfersController : ControllerBase
 {
 
@@ -27,7 +29,7 @@ public class TransfersController : ControllerBase
 
         try
         {
-            var result = await _unitOfWork.transferRepository.TransferRequest(transferRequest);
+            var result = await _unitOfWork.transferRepository.TransferRequestAsync(transferRequest);
 
             switch (result.Item1)
             {

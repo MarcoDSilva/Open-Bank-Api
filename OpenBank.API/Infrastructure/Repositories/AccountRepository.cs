@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using OpenBank.Api.Data;
 using OpenBank.API.Domain.Entities;
 using OpenBank.API.DTO;
@@ -83,13 +82,12 @@ public class AccountRepository : IAccountRepository
             var movements = existantMovements.FindAll(mov => mov.AccountId == account.Id).ToList();
 
             List<MovimResponse> movementsToDTO = new List<MovimResponse>();
-
             foreach (Movim movement in movements)
             {
                 movementsToDTO.Add(new MovimResponse()
                 {
                     Id = movement.Id,
-                    Amount = movement.Balance,
+                    Amount = movement.Amount,
                     Created_at = movement.Created_at,
                     OperationType = movement.OperationType
                 });

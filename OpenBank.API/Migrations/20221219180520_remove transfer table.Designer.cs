@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OpenBank.Api.Data;
@@ -11,9 +12,11 @@ using OpenBank.Api.Data;
 namespace OpenBank.API.Migrations
 {
     [DbContext(typeof(OpenBankApiDbContext))]
-    partial class OpenBankApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221219180520_remove transfer table")]
+    partial class removetransfertable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,7 +63,7 @@ namespace OpenBank.API.Migrations
                     b.Property<int>("AccountId")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("Amount")
+                    b.Property<decimal>("Balance")
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("Created_at")

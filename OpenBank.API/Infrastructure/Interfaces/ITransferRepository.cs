@@ -5,5 +5,5 @@ namespace OpenBank.API.Infrastructure.Interfaces;
 
 public interface ITransferRepository 
 {
-    Task<(StatusCode,string)> TransferRequest(TransferRequest transfer);
+    Task<(StatusCode,string)> TransferRequestAsync(TransferRequest transfer);
 }
