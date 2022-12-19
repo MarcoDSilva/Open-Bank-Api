@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.DTO;
-
-
+using OpenBank.API.Infrastructure.Interfaces;
 
 namespace OpenBank.API.Controllers;
 
@@ -10,10 +9,25 @@ namespace OpenBank.API.Controllers;
 public class TransfersController : ControllerBase
 {
 
-    [HttpPost]
-    public IActionResult Transfers(TransferRequest transferRequest)
+    private readonly IUnitOfWork _unitOfWork;
+
+    public TransfersController(IUnitOfWork unitOfWork)
     {
-        return Ok();
+        _unitOfWork = unitOfWork;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Transfers(TransferRequest transferRequest)
+    {
+        try
+        {
+            var result = _unitOfWork.transferRepository.TransferRequest(transferRequest);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            return Problem(e.Message);
+        }
     }
 
 }

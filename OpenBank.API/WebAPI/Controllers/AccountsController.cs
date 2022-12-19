@@ -1,3 +1,4 @@
+using Swashbuckle.AspNetCore.SwaggerUI;
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Infrastructure.Interfaces;
 using OpenBank.API.DTO;
@@ -68,8 +69,9 @@ public class AccountsController : ControllerBase
 
     [HttpGet]
     [Route("{id}")]
+
     /// <summary>
-    /// Get X account
+    /// Get the account and movements
     /// </summary>
     public async Task<IActionResult> Accounts(int id, string permission) // remover ambos os params por um token
     {
