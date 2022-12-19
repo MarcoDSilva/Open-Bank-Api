@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using OpenBank.Api.Data;
 using OpenBank.API.Domain.Entities;
 using OpenBank.API.DTO;
@@ -56,6 +57,7 @@ public class AccountRepository : IAccountRepository
             throw new Exception("Error while obtaining the movements of the account");
         }
     }
+
     public async Task<List<Account>> GetAccounts(int userId)
     {
         var existantAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
@@ -69,6 +71,27 @@ public class AccountRepository : IAccountRepository
         {
             Console.WriteLine("Error {0}", e.Message); //Log erro
             throw new Exception("Error while obtaining the accounts");
+        }
+    }
+
+    public async Task<AccountMovim> GetAccountMovements(Account account)
+    {
+        var existantMovements = await _openBankApiDbContext.Movim.ToListAsync();
+
+        try
+        {
+            var movements = existantMovements.FindAll(mov => mov.AccountId == account.Id).ToList();
+            AccountMovim accountMovim = new AccountMovim()
+            {
+                Account = account,
+                Movimentos = movements
+            };
+
+            return accountMovim;
+        }
+        catch (Exception e)
+        {
+            throw new Exception(e.Message);
         }
     }
 

@@ -10,4 +10,6 @@ public interface IAccountRepository
     Task<CreateAccountRequest> CreateAccount(int idUser, CreateAccountRequest createAccount);
     Task<Account> GetAccountById(int accountId);
     Task<List<Account>> GetAccounts(int userId);
+
+    Task<AccountMovim> GetAccountMovements(Account account);
 }

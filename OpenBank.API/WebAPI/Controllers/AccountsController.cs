@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Infrastructure.Interfaces;
 using OpenBank.API.DTO;
+using OpenBank.API.Domain.Entities;
 
 namespace OpenBank.API.Controllers;
 
@@ -16,16 +17,8 @@ public class AccountsController : ControllerBase
     }
 
     /* CONTROL TEST to validate the logic and cruds. Real one will use a token */
-    // [HttpGet]
-    // [Route("accounts")]
-    // public IActionResult Accounts(User user)
-    // {
-    //     return Ok();
-    // }
-
-    /* CONTROL TEST to validate the logic and cruds. Real one will use a token */
     [HttpPost]
-    public IActionResult Accounts(int idUser, CreateAccountRequest accountRequest)
+    public async Task<IActionResult> Accounts(int idUser, CreateAccountRequest accountRequest)
     {
         // validar campos vazios
         if (idUser <= 0)
@@ -35,8 +28,8 @@ public class AccountsController : ControllerBase
 
         try
         {
-            var result = _unitOfWork.accountRepository.CreateAccount(idUser, accountRequest);
-            return Ok(result.Result);
+            var result = await _unitOfWork.accountRepository.CreateAccount(idUser, accountRequest);
+            return Ok(result);
         }
         catch (Exception e)
         {
@@ -44,24 +37,12 @@ public class AccountsController : ControllerBase
         }
     }
 
-    /*
-        Create account
-    */
-    // [HttpPost]
-    // [Route("accounts")]
-    // public IActionResult Accounts(CreateAccountRequest accountRequest)
-    // {
-    //     // validar campos vazios
-    //     var result = _accountRepository.CreateAccount(accountRequest);
-    //     return Ok();
-    // }
-
     [HttpGet]
     /// <summary>
     /// WARNING: This is the regular Accounts() Controller, which will use the Token to validate the user and then
     /// show all the associated accounts
     /// </summary>
-    public IActionResult Accounts(int id)
+    public async Task<IActionResult> Accounts(int id)
     {
         // validar campos vazios
         if (id <= 0)
@@ -71,11 +52,12 @@ public class AccountsController : ControllerBase
 
         try
         {
-            var result = _unitOfWork.accountRepository.GetAccounts(id);
+            var result = await _unitOfWork.accountRepository.GetAccounts(id);
 
-            if (result.Result == null || result.Result.Count == 0) return NotFound();
+            if (result == null || result.Count == 0)
+                return NotFound("Account not found.");
 
-            return Ok(result.Result);
+            return Ok(result);
         }
         catch (Exception e)
         {
@@ -89,8 +71,28 @@ public class AccountsController : ControllerBase
     /// <summary>
     /// Get X account
     /// </summary>
-    public IActionResult Accounts(int id, string permission) // remover ambos os params por um token
+    public async Task<IActionResult> Accounts(int id, string permission) // remover ambos os params por um token
     {
-        return NotFound();
+        // validar campos vazios
+        if (id <= 0)
+        {
+            return Problem("id must be higher than 0");
+        }
+
+        try
+        {
+            Account account = await _unitOfWork.accountRepository.GetAccountById(id);
+
+            if (account is null)
+                return Ok("There is no account with this ID");
+
+            return Ok(account);
+        }
+        catch (Exception e)
+        {
+            return Problem(e.Message);
+        }
+
+        //return NotFound();
     }
 }
