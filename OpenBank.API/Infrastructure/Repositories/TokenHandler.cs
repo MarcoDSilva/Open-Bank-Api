@@ -53,8 +53,9 @@ public class TokenHandler : ITokenHandler
 
     public int GetUserIdByToken(string token)
     {
-        JwtSecurityToken decodedToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
-        int userId = int.Parse(decodedToken.Header.First(kp => kp.Key.Contains("userId")).Value.ToString());
-        return 0;        
+        JwtSecurityToken decodedToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(token);
+        string userId = decodedToken.Claims.First(claim => claim.Type.Equals("userId")).Value;
+        
+        return int.Parse(userId);        
     }
 }

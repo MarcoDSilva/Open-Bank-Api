@@ -20,17 +20,24 @@ public class AccountsController : ControllerBase
 
     /* CONTROL TEST to validate the logic and cruds. Real one will use a token */
     [HttpPost]
-    public async Task<IActionResult> Accounts(int idUser, CreateAccountRequest accountRequest)
+    public async Task<IActionResult> Accounts(CreateAccountRequest accountRequest)
     {
+        var authToken = HttpContext.Request.Headers["Authorization"];
+
+        if (string.IsNullOrWhiteSpace(authToken))
+            return Forbid("You are not logged in.");
+
+        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+
         // validar campos vazios
-        if (idUser <= 0)
+        if (userId <= 0)
         {
-            return Problem("ID must be a number higher than 0");
+            return Problem("User id must be a number higher than 0");
         }
 
         try
         {
-            var result = await _unitOfWork.accountRepository.CreateAccount(idUser, accountRequest);
+            var result = await _unitOfWork.accountRepository.CreateAccount(userId, accountRequest);
             return Ok(result);
         }
         catch (Exception e)
@@ -47,12 +54,18 @@ public class AccountsController : ControllerBase
     public async Task<IActionResult> Accounts(int id)
     {
         var authToken = HttpContext.Request.Headers["Authorization"];
-        var test = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
 
-        // validar campos vazios
+        if (string.IsNullOrWhiteSpace(authToken))
+            return Forbid("You are not logged in.");
+
+        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+
+        if (userId <= 0)
+            return Forbid("You must login first");
+
         if (id <= 0)
         {
-            return Problem("id must be higher than 0");
+            return Problem("Account id must be higher than 0");
         }
 
         try

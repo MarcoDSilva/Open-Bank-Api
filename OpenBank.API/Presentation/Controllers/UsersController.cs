@@ -9,12 +9,10 @@ namespace OpenBank.API.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ITokenHandler _tokenHandler;
 
-    public UsersController(IUnitOfWork unitOfWork, ITokenHandler tokenHandler)
+    public UsersController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
-        _tokenHandler = tokenHandler;
     }
 
     // call to verify the connection with the db
@@ -46,5 +44,5 @@ public class UsersController : ControllerBase
         {
             return Problem(e.Message);
         }
-    }  
+    }
 }
