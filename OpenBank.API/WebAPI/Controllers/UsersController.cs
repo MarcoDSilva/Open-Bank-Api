@@ -49,38 +49,5 @@ public class UsersController : ControllerBase
         {
             return Problem(e.Message);
         }
-    }
-
-    [HttpPost("login")]
-    ///<summary>
-    /// Login request 
-    ///</summary>
-    public async Task<IActionResult> Login(LoginUserRequest loginRequest)
-    {
-
-        if (string.IsNullOrWhiteSpace(loginRequest?.Password) || string.IsNullOrWhiteSpace(loginRequest?.UserName))
-            return BadRequest("Username and password cannot be empty fields");
-
-        try
-        {
-            int userId = _unitOfWork.userRepository.IsLoginValid(loginRequest);
-
-            if (userId <= 0)
-                return Unauthorized("Login or username incorrect!");
-
-            // creating token
-            LoginUserResponse loginUserResponse = await _tokenHandler.CreateTokenAsync(loginRequest);
-
-            if (string.IsNullOrWhiteSpace(loginUserResponse?.AcessToken))
-                return Problem("Could not login due to issues with the server");
-
-            return Ok(loginUserResponse);
-        }
-        catch (Exception e)
-        {
-            return Problem(e.Message);
-        }
-
-
-    }
+    }  
 }

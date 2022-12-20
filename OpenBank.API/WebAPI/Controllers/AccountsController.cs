@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Infrastructure.Interfaces;
 using OpenBank.API.Infrastructure.DTO;
 using OpenBank.API.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OpenBank.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class AccountsController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;

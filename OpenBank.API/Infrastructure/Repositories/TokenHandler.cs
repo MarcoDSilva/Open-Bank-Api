@@ -1,10 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
+using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
-using OpenBank.API.Domain.Entities;
+using System.IdentityModel.Tokens.Jwt;
 using OpenBank.API.Infrastructure.DTO;
 using OpenBank.API.Infrastructure.Interfaces;
+using System.Data.Common;
 
 namespace OpenBank.API.Infrastructure.Repositories;
 
@@ -19,20 +19,19 @@ public class TokenHandler : ITokenHandler
 
     public Task<LoginUserResponse> CreateTokenAsync(LoginUserRequest loginUserRequest, int userId)
     {
-        string sessionId = Guid.NewGuid().ToString();
         DateTime expirationDate = DateTime.UtcNow.AddMinutes(5);
 
         List<Claim> claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.Expiration, expirationDate.ToString()),
             new Claim("userId", userId.ToString()),
+            new Claim(ClaimTypes.Expiration, expirationDate.ToString()),
             new Claim(ClaimTypes.NameIdentifier, loginUserRequest.UserName)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var token = new JwtSecurityToken(
+        JwtSecurityToken token = new JwtSecurityToken(
             _configuration["Jwt:Issuer"],
             _configuration["Jwt:Audience"],
             claims,
@@ -46,7 +45,7 @@ public class TokenHandler : ITokenHandler
         {
             AcessToken = generatedToken,
             AcessTokenExpires = expirationDate.ToString(),
-            SessionId = sessionId
+            SessionId = ""
         };
 
         return Task.FromResult(response);
