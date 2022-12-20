@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace OpenBank.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/")]
 public class LoginController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -18,7 +18,7 @@ public class LoginController : ControllerBase
         _tokenHandler = tokenHandler;
     }
 
-    [HttpPost("login")]
+    [HttpPost("users/login")]
     ///<summary>
     /// Login request 
     ///</summary>
