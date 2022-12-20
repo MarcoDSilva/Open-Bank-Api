@@ -4,13 +4,13 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using OpenBank.API.Infrastructure.DTO;
 using OpenBank.API.Infrastructure.Interfaces;
-using System.Data.Common;
 
 namespace OpenBank.API.Infrastructure.Repositories;
 
 public class TokenHandler : ITokenHandler
 {
     private readonly IConfiguration _configuration;
+    private const int EXPIRATION_TIME = 5;
 
     public TokenHandler(IConfiguration configuration)
     {
@@ -19,7 +19,7 @@ public class TokenHandler : ITokenHandler
 
     public Task<LoginUserResponse> CreateTokenAsync(LoginUserRequest loginUserRequest, int userId)
     {
-        DateTime expirationDate = DateTime.UtcNow.AddMinutes(5);
+        DateTime expirationDate = DateTime.UtcNow.AddMinutes(EXPIRATION_TIME);
 
         List<Claim> claims = new List<Claim>()
         {
@@ -49,5 +49,12 @@ public class TokenHandler : ITokenHandler
         };
 
         return Task.FromResult(response);
+    }
+
+    public int GetUserIdByToken(string token)
+    {
+        JwtSecurityToken decodedToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
+        int userId = int.Parse(decodedToken.Header.First(kp => kp.Key.Contains("userId")).Value.ToString());
+        return 0;        
     }
 }

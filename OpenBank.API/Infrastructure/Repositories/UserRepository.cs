@@ -82,6 +82,5 @@ public class UserRepository : IUserRepository
             throw new Exception($"Server issues: {e.Message}" );
         }
     }
-
 }
 

@@ -46,6 +46,9 @@ public class AccountsController : ControllerBase
     /// </summary>
     public async Task<IActionResult> Accounts(int id)
     {
+        var authToken = HttpContext.Request.Headers["Authorization"];
+        var test = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+
         // validar campos vazios
         if (id <= 0)
         {

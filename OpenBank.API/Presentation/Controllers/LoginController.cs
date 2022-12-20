@@ -10,12 +10,10 @@ namespace OpenBank.API.Controllers;
 public class LoginController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ITokenHandler _tokenHandler;
 
-    public LoginController(IUnitOfWork unitOfWork, ITokenHandler tokenHandler)
+    public LoginController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
-        _tokenHandler = tokenHandler;
     }
 
     [HttpPost("users/login")]
@@ -34,7 +32,7 @@ public class LoginController : ControllerBase
             if (userId > 0)
             {
                 // creating token
-                LoginUserResponse loginUserResponse = await _tokenHandler.CreateTokenAsync(loginRequest, userId);
+                LoginUserResponse loginUserResponse = await _unitOfWork.tokenHandler.CreateTokenAsync(loginRequest, userId);
 
                 if (string.IsNullOrWhiteSpace(loginUserResponse?.AcessToken))
                     return Problem("Could not login due to issues with the server");

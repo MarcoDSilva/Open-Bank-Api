@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Infrastructure.Interfaces;
 using OpenBank.API.Infrastructure.DTO;
-using Microsoft.AspNetCore.Authorization;
 
 namespace OpenBank.API.Controllers;
 
@@ -33,8 +32,6 @@ public class UsersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Users(CreateUserRequest createUser)
     {
-        // validar campos vazios
-
         bool usernameAvailable = _unitOfWork.userRepository.IsUsernameAvailable(createUser.Username);
 
         if (!usernameAvailable)
