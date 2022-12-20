@@ -1,4 +1,4 @@
-using OpenBank.API.DTO;
+using OpenBank.API.Infrastructure.DTO;
 using OpenBank.Api.Data;
 using OpenBank.API.Domain.Entities;
 using OpenBank.API.Infrastructure.Interfaces;
@@ -60,7 +60,7 @@ public class UserRepository : IUserRepository
         return string.IsNullOrEmpty(exists?.UserName);
     }
 
-    public bool IsLoginValid(LoginUserRequest login)
+    public int IsLoginValid(LoginUserRequest login)
     {
         try
         {
@@ -68,14 +68,14 @@ public class UserRepository : IUserRepository
                                     .ToList()
                                     .Find(user => user.UserName.ToLower() == login.UserName.ToLower());
 
-            if (string.IsNullOrWhiteSpace(existentUser?.UserName)) return false;
+            if (string.IsNullOrWhiteSpace(existentUser?.UserName)) return 0;
 
             PasswordHasher<string> pwHasher = new PasswordHasher<string>();
             int validUser = (int)pwHasher.VerifyHashedPassword(
                                     login.UserName, existentUser.Password, login.Password
                                 );
 
-            return validUser != 0;
+            return validUser > 0 ? existentUser.Id : 0;
         }
         catch (Exception e)
         {

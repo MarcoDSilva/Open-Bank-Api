@@ -1,4 +1,4 @@
-namespace OpenBank.API.DTO;
+namespace OpenBank.API.Infrastructure.DTO;
 
 using OpenBank.API.Domain.Entities;
 

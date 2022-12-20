@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OpenBank.Api.Data;
 using OpenBank.API.Domain.Entities;
-using OpenBank.API.DTO;
+using OpenBank.API.Infrastructure.DTO;
 using OpenBank.API.Infrastructure.Interfaces;
 using OpenBank.API.Infrastructure.Enum;
 using OpenBank.Api.Infrastructure.Shared;

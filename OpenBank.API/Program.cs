@@ -26,7 +26,7 @@ builder.Services.AddDbContext<OpenBankApiDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransferRepository, TransferRepository>();
-
+builder.Services.AddScoped<ITokenHandler, OpenBank.API.Infrastructure.Repositories.TokenHandler>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

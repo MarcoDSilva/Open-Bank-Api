@@ -1,5 +1,4 @@
-namespace OpenBank.API.DTO;
-
+namespace OpenBank.API.Infrastructure.DTO;
 
 public class CreateUserResponse
 {

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Infrastructure.Interfaces;
-using OpenBank.API.DTO;
+using OpenBank.API.Infrastructure.DTO;
 using OpenBank.API.Domain.Entities;
 
 namespace OpenBank.API.Controllers;

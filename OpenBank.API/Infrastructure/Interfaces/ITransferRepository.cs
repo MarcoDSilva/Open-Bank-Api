@@ -1,4 +1,4 @@
-using OpenBank.API.DTO;
+using OpenBank.API.Infrastructure.DTO;
 using OpenBank.API.Infrastructure.Enum;
 
 namespace OpenBank.API.Infrastructure.Interfaces;

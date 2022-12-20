@@ -1,20 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Infrastructure.Interfaces;
-using OpenBank.API.DTO;
+using OpenBank.API.Infrastructure.DTO;
 using Microsoft.AspNetCore.Authorization;
 
 namespace OpenBank.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class UsersController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ITokenHandler _tokenHandler;
 
-    public UsersController(IUnitOfWork unitOfWork)
+    public UsersController(IUnitOfWork unitOfWork, ITokenHandler tokenHandler)
     {
         _unitOfWork = unitOfWork;
+        _tokenHandler = tokenHandler;
     }
 
     // call to verify the connection with the db
@@ -54,7 +55,7 @@ public class UsersController : ControllerBase
     ///<summary>
     /// Login request 
     ///</summary>
-    public IActionResult Login(LoginUserRequest loginRequest)
+    public async Task<IActionResult> Login(LoginUserRequest loginRequest)
     {
 
         if (string.IsNullOrWhiteSpace(loginRequest?.Password) || string.IsNullOrWhiteSpace(loginRequest?.UserName))
@@ -62,12 +63,18 @@ public class UsersController : ControllerBase
 
         try
         {
-            bool loginValid = _unitOfWork.userRepository.IsLoginValid(loginRequest);
+            int userId = _unitOfWork.userRepository.IsLoginValid(loginRequest);
 
-            if (!loginValid)
+            if (userId <= 0)
                 return Unauthorized("Login or username incorrect!");
 
-            return Ok(loginRequest.UserName);
+            // creating token
+            LoginUserResponse loginUserResponse = await _tokenHandler.CreateTokenAsync(loginRequest);
+
+            if (string.IsNullOrWhiteSpace(loginUserResponse?.AcessToken))
+                return Problem("Could not login due to issues with the server");
+
+            return Ok(loginUserResponse);
         }
         catch (Exception e)
         {
