@@ -42,6 +42,7 @@ public class UsersController : ControllerBase
         }
         catch (Exception e)
         {
+            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Error caught on control Users with the message: {e.Message}");
             return Problem(e.Message);
         }
     }

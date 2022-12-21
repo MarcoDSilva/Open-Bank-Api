@@ -8,12 +8,20 @@ public class UnitOfWork : IUnitOfWork
     public IAccountRepository accountRepository { get; }
     public ITransferRepository transferRepository { get; }
     public ITokenHandler tokenHandler { get; }
+    public ILogger loggerHandler { get; }
 
-    public UnitOfWork(IUserRepository userRepository, IAccountRepository accountRepository, ITransferRepository transferRepository, ITokenHandler tokenHandler)
+    public UnitOfWork(
+        IUserRepository userRepository,
+        IAccountRepository accountRepository,
+        ITransferRepository transferRepository,
+        ITokenHandler tokenHandler,
+        ILogger loggerHandler
+        )
     {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.transferRepository = transferRepository;
         this.tokenHandler = tokenHandler;
+        this.loggerHandler = loggerHandler;
     }
 }

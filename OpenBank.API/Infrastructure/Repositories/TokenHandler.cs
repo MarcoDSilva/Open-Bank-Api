@@ -11,6 +11,7 @@ public class TokenHandler : ITokenHandler
 {
     private readonly IConfiguration _configuration;
     private const int EXPIRATION_TIME = 5;
+    private readonly ILogger _tokenLogger;
 
     public TokenHandler(IConfiguration configuration)
     {
@@ -66,7 +67,7 @@ public class TokenHandler : ITokenHandler
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error {0}", e.Message); //Log erro
+            _tokenLogger.Log(LogLevel.Error, $"Error at GetUserIdByToken with the following message: {e.Message}");
             throw new Exception("Error while validating user");
         }
     }

@@ -47,8 +47,8 @@ public class TransfersController : ControllerBase
         }
         catch (Exception e)
         {
+            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Transfers with the message: {e.Message}");
             return Problem(e.Message);
         }
     }
-
 }

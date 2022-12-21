@@ -34,6 +34,7 @@ public class AccountsController : ControllerBase
         }
         catch (Exception e)
         {
+            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Accounts with the message: {e.Message}");
             return Problem(e.Message);
         }
     }
@@ -61,6 +62,7 @@ public class AccountsController : ControllerBase
         }
         catch (Exception e)
         {
+            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Accounts with the message: {e.Message}");
             return Problem(e.Message);
         }
     }
@@ -82,7 +84,7 @@ public class AccountsController : ControllerBase
 
         // validar campos vazios
         if (id <= 0)
-            return BadRequest("id must be higher than 0");
+            return BadRequest("Account id must be higher than 0");
 
         try
         {
@@ -97,10 +99,12 @@ public class AccountsController : ControllerBase
         }
         catch (ForbiddenAccountAccessException ex)
         {
+            _unitOfWork.loggerHandler.Log(LogLevel.Information, $"Exception caught on controller Accounts with the message: {ex.Message}");
             return Forbid(ex.Message);
         }
         catch (Exception e)
         {
+            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Accounts with the message: {e.Message}");
             return Problem(e.Message);
         }
     }
