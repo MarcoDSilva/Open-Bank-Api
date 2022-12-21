@@ -51,11 +51,15 @@ public class TokenHandler : ITokenHandler
         return Task.FromResult(response);
     }
 
-    public int GetUserIdByToken(string token)
+    public int GetUserIdByToken(string tokenWithBearer)
     {
-        JwtSecurityToken decodedToken = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(token);
-        string userId = decodedToken.Claims.First(claim => claim.Type.Equals("userId")).Value;
+        if (string.IsNullOrWhiteSpace(tokenWithBearer)) return 0; // validations against a possible empty header token
+
+        string tokenWithoutBearer = tokenWithBearer.Replace("Bearer ", "");
+        IEnumerable<Claim> claims = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(tokenWithoutBearer).Claims;
+
+        string user = claims.First(c => c.Type == "userId").Value;       
         
-        return int.Parse(userId);        
+        return int.Parse(user);        
     }
 }

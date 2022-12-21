@@ -23,16 +23,12 @@ public class AccountsController : ControllerBase
     public async Task<IActionResult> Accounts(CreateAccountRequest accountRequest)
     {
         var authToken = HttpContext.Request.Headers["Authorization"];
-
-        if (string.IsNullOrWhiteSpace(authToken))
-            return Forbid("You are not logged in.");
-
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
 
         // validar campos vazios
         if (userId <= 0)
         {
-            return Problem("User id must be a number higher than 0");
+            return Unauthorized("Accout is not valid or does not exist.");
         }
 
         try
@@ -48,29 +44,19 @@ public class AccountsController : ControllerBase
 
     [HttpGet]
     /// <summary>
-    /// WARNING: This is the regular Accounts() Controller, which will use the Token to validate the user and then
-    /// show all the associated accounts
+    /// Gets all the accounts that the logged in user has
     /// </summary>
-    public async Task<IActionResult> Accounts(int id)
+    public async Task<IActionResult> Accounts()
     {
         var authToken = HttpContext.Request.Headers["Authorization"];
-
-        if (string.IsNullOrWhiteSpace(authToken))
-            return Forbid("You are not logged in.");
-
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
 
         if (userId <= 0)
-            return Forbid("You must login first");
-
-        if (id <= 0)
-        {
-            return Problem("Account id must be higher than 0");
-        }
+            return Unauthorized("You must login first");
 
         try
         {
-            var result = await _unitOfWork.accountRepository.GetAccounts(id);
+            var result = await _unitOfWork.accountRepository.GetAccounts(userId);
 
             if (result == null || result.Count == 0)
                 return NotFound("Account not found.");
@@ -88,10 +74,16 @@ public class AccountsController : ControllerBase
     [Route("{id}")]
 
     /// <summary>
-    /// Get the account and movements
+    /// Get the account and movements associated with the id
     /// </summary>
-    public async Task<IActionResult> Accounts(int id, string permission) // remover ambos os params por um token
+    public async Task<IActionResult> Accounts(int id) 
     {
+        var authToken = HttpContext.Request.Headers["Authorization"];
+        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+
+        if (userId <= 0)
+            return Unauthorized("You must login first");
+        
         // validar campos vazios
         if (id <= 0)
         {
