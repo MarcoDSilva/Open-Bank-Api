@@ -26,7 +26,7 @@ public class AccountRepository : IAccountRepository
         {
             Balance = createAccount.Amount,
             Created_at = DateTime.UtcNow,
-            Currency = "EUR",
+            Currency = createAccount.Currency,
             UserId = idUser
         };
 

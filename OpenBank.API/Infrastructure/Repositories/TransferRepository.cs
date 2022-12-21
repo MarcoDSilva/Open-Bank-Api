@@ -79,13 +79,13 @@ public class TransferRepository : ITransferRepository
         if (toAcc is null)
             return (StatusCode.NotFound, "Account_to was not found.");
 
-        if (toAcc.UserId != userId)
+        if (fromAcc.UserId != userId)
             return (StatusCode.Forbidden, "Bearer");
 
         if (fromAcc.Balance < transfer.Amount)
             return (StatusCode.BadRequest, "Account_from balance is lower than the transfer amount.");
 
-        if (!fromAcc.Currency.Equals(toAcc.Currency))
+        if (fromAcc.Currency != toAcc.Currency)
             return (StatusCode.BadRequest, "Accounts have different currencies.");
 
         return (StatusCode.Sucess, "");
