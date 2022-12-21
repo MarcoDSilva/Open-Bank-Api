@@ -8,14 +8,14 @@ public class UnitOfWork : IUnitOfWork
     public IAccountRepository accountRepository { get; }
     public ITransferRepository transferRepository { get; }
     public ITokenHandler tokenHandler { get; }
-    public ILogger loggerHandler { get; }
+    public ILogger<Object> loggerHandler { get; }
 
     public UnitOfWork(
         IUserRepository userRepository,
         IAccountRepository accountRepository,
         ITransferRepository transferRepository,
         ITokenHandler tokenHandler,
-        ILogger loggerHandler
+        ILogger<Object> loggerHandler
         )
     {
         this.userRepository = userRepository;

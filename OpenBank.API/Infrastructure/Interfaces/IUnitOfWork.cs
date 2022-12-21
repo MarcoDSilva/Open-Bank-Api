@@ -8,5 +8,5 @@ public interface IUnitOfWork
     IAccountRepository accountRepository { get; }
     ITransferRepository transferRepository { get; }
     ITokenHandler tokenHandler { get; }
-    ILogger loggerHandler {get; }
+    ILogger<Object> loggerHandler {get; }
 }
