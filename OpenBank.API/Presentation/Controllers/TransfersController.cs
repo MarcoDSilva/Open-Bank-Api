@@ -45,10 +45,6 @@ public class TransfersController : ControllerBase
                     return Ok(result.Item2);
             }
         }
-        catch (ForbiddenAccountAccessException ex)
-        {
-            return Forbid(ex.Message);
-        }
         catch (Exception e)
         {
             return Problem(e.Message);
