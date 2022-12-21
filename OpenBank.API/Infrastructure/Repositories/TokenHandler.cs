@@ -55,11 +55,19 @@ public class TokenHandler : ITokenHandler
     {
         if (string.IsNullOrWhiteSpace(tokenWithBearer)) return 0; // validations against a possible empty header token
 
-        string tokenWithoutBearer = tokenWithBearer.Replace("Bearer ", "");
-        IEnumerable<Claim> claims = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(tokenWithoutBearer).Claims;
+        try
+        {
+            string tokenWithoutBearer = tokenWithBearer.Replace("Bearer ", "");
+            IEnumerable<Claim> claims = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(tokenWithoutBearer).Claims;
 
-        string user = claims.First(c => c.Type == "userId").Value;       
-        
-        return int.Parse(user);        
+            string user = claims.First(c => c.Type == "userId").Value;
+
+            return int.Parse(user);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error {0}", e.Message); //Log erro
+            throw new Exception("Error while validating user");
+        }
     }
 }

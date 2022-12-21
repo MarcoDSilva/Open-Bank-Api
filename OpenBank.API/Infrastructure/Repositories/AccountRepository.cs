@@ -15,7 +15,11 @@ public class AccountRepository : IAccountRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    /* Control test*/
+    /// <summary>
+    /// Creates a new account for the user
+    /// <exception>Exception in case something fails </exception>
+    /// <returns>A Task with the request back if succeded the creation</returns>
+    /// </summary>
     public async Task<CreateAccountRequest> CreateAccount(int idUser, CreateAccountRequest createAccount)
     {
         Account account = new Account()
@@ -40,23 +44,29 @@ public class AccountRepository : IAccountRepository
         }
     }
 
-    public async Task<Account> GetAccountById(int accountId)
+    /// <summary>
+    /// Gets the account by the selected id
+    /// <exception>Exception in case something fails | Forbidden account in case the user is not the owner of the account </exception>
+    /// <returns>A Task with the account if the account was found</returns>
+    /// </summary>
+    public async Task<Account> GetAccountById(int accountId, int userId)
     {
-        var accountList = await _openBankApiDbContext.Accounts.ToListAsync();
+        List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
 
-        try
-        {
-            var account = accountList.Find(acc => acc.Id == accountId);
+        Account? account = accountList.Find(acc => acc.Id == accountId);
 
-            return account;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Error {0}", e.Message); //Log erro
-            throw new Exception("Error while obtaining the movements of the account");
-        }
+        if (account?.UserId != userId)
+            throw new ForbiddenAccountAccessException("You have no permissions to see this account.");
+
+        return account;
     }
 
+
+    /// <summary>
+    /// Gets all the accounts belonging to the user
+    /// <exception>Exception in case something fails </exception>
+    /// <returns>A Task with a list of accounts</returns>
+    /// </summary>
     public async Task<List<Account>> GetAccounts(int userId)
     {
         var existantAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
@@ -73,13 +83,18 @@ public class AccountRepository : IAccountRepository
         }
     }
 
+    /// <summary>
+    /// Gets all the account movements belonging to the account
+    /// <exception>Exception in case something fails </exception>
+    /// <returns>A Task with the account movements</returns>
+    /// </summary>
     public async Task<AccountMovim> GetAccountMovements(Account account)
     {
         var existantMovements = await _openBankApiDbContext.Movim.ToListAsync();
 
         try
         {
-            var movements = existantMovements.FindAll(mov => mov.AccountId == account.Id).ToList();
+            List<Movim> movements = existantMovements.FindAll(mov => mov.AccountId == account.Id).ToList();
 
             List<MovimResponse> movementsToDTO = new List<MovimResponse>();
             foreach (Movim movement in movements)
@@ -103,6 +118,7 @@ public class AccountRepository : IAccountRepository
         }
         catch (Exception e)
         {
+            Console.WriteLine("Error {0}", e.Message); //Log erro
             throw new Exception(e.Message);
         }
     }

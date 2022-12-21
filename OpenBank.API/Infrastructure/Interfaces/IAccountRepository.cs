@@ -7,7 +7,7 @@ public interface IAccountRepository
 {
     //Task<CreateAccountRequest> CreateAccount(CreateAccountRequest createAccount);
     Task<CreateAccountRequest> CreateAccount(int idUser, CreateAccountRequest createAccount);
-    Task<Account> GetAccountById(int accountId);
+    Task<Account> GetAccountById(int accountId, int userId);
     Task<List<Account>> GetAccounts(int userId);
 
     Task<AccountMovim> GetAccountMovements(Account account);
