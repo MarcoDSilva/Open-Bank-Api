@@ -21,15 +21,15 @@ public class TransfersController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Transfers(TransferRequest transferRequest)
     {
-        // if (login != true)
-        //     return Unauthorized();
+        string authToken = HttpContext.Request.Headers["Authorization"].ToString();
+        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
 
-        // if (permission != true)
-        //    return Forbid();        
+        if (userId <= 0)
+            return Unauthorized("You must login first");
 
         try
         {
-            var result = await _unitOfWork.transferRepository.TransferRequestAsync(transferRequest);
+            var result = await _unitOfWork.transferRepository.TransferRequestAsync(transferRequest, userId);
 
             switch (result.Item1)
             {
@@ -39,9 +39,15 @@ public class TransfersController : ControllerBase
                     return BadRequest(result.Item2);
                 case Infrastructure.Enum.StatusCode.NotFound:
                     return NotFound(result.Item2);
+                case Infrastructure.Enum.StatusCode.Forbidden:
+                    return Forbid(result.Item2);
                 default:
                     return Ok(result.Item2);
             }
+        }
+        catch (ForbiddenAccountAccessException ex)
+        {
+            return Forbid(ex.Message);
         }
         catch (Exception e)
         {

@@ -37,7 +37,7 @@ public class UsersController : ControllerBase
 
         try
         {
-            var result = await _unitOfWork.userRepository.CreateUser(createUser);
+            CreateUserRequest result = await _unitOfWork.userRepository.CreateUser(createUser);
             return Ok(result);
         }
         catch (Exception e)

@@ -17,14 +17,14 @@ public class TransferRepository : ITransferRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    public async Task<(StatusCode, string)> TransferRequestAsync(TransferRequest transfer)
+    public async Task<(StatusCode, string)> TransferRequestAsync(TransferRequest transfer, int userId)
     {
         var accountsList = await _openBankApiDbContext.Accounts.ToListAsync();
         Account? accountFrom = accountsList.Find(acc => acc.Id == transfer.From_account);
         Account? accountTo = accountsList.Find(acc => acc.Id == transfer.To_account);
 
         // validation
-        (StatusCode, string) validation = ValidateAccountsForTransfer(accountFrom, accountTo, transfer);
+        (StatusCode, string) validation = ValidateAccountsForTransfer(accountFrom, accountTo, transfer, userId);
         if (validation.Item1 != StatusCode.Sucess)
         {
             return validation;
@@ -71,13 +71,16 @@ public class TransferRepository : ITransferRepository
         }
     }
 
-    private (StatusCode, string) ValidateAccountsForTransfer(Account? fromAcc, Account? toAcc, TransferRequest transfer)
+    private (StatusCode, string) ValidateAccountsForTransfer(Account? fromAcc, Account? toAcc, TransferRequest transfer, int userId)
     {
         if (fromAcc is null)
             return (StatusCode.NotFound, "Account_from was not found.");
 
         if (toAcc is null)
             return (StatusCode.NotFound, "Account_to was not found.");
+
+        if (toAcc.UserId != userId)
+            return (StatusCode.Forbidden, "Bearer");
 
         if (fromAcc.Balance < transfer.Amount)
             return (StatusCode.BadRequest, "Account_from balance is lower than the transfer amount.");

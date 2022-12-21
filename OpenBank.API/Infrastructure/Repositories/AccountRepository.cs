@@ -49,16 +49,31 @@ public class AccountRepository : IAccountRepository
     /// <exception>Exception in case something fails | Forbidden account in case the user is not the owner of the account </exception>
     /// <returns>A Task with the account if the account was found</returns>
     /// </summary>
-    public async Task<Account> GetAccountById(int accountId, int userId)
+    public async Task<AccountResponse> GetAccountById(int accountId, int userId)
     {
-        List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
+        try
+        {
+            List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
 
-        Account? account = accountList.Find(acc => acc.Id == accountId);
+            Account? account = accountList.Find(acc => acc.Id == accountId);
 
-        if (account?.UserId != userId)
-            throw new ForbiddenAccountAccessException("You have no permissions to see this account.");
+            if (account?.UserId != userId)
+                throw new ForbiddenAccountAccessException("Bearer"); // the error has to be issued as bearer for JWT to allow the forbid
 
-        return account;
+            AccountResponse accountDTO = AccountToDTO(account);
+
+            return accountDTO;
+        }
+        catch (ForbiddenAccountAccessException e)
+        {
+            Console.WriteLine("Error {0}", e.Message); //Log erro
+            throw new ForbiddenAccountAccessException("Bearer");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error {0}", e.Message); //Log erro
+            throw new Exception(e.Message);
+        }
     }
 
 
@@ -67,14 +82,19 @@ public class AccountRepository : IAccountRepository
     /// <exception>Exception in case something fails </exception>
     /// <returns>A Task with a list of accounts</returns>
     /// </summary>
-    public async Task<List<Account>> GetAccounts(int userId)
+    public async Task<List<AccountResponse>> GetAccounts(int userId)
     {
-        var existantAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
+        List<Account> existantAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
+
         try
         {
-            var accounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList();
+            List<Account> userAccounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList();
 
-            return accounts;
+            List<AccountResponse> accountResponses = new List<AccountResponse>();
+
+            userAccounts.ForEach(acc => accountResponses.Add(AccountToDTO(acc)));
+
+            return accountResponses;
         }
         catch (Exception e)
         {
@@ -88,7 +108,7 @@ public class AccountRepository : IAccountRepository
     /// <exception>Exception in case something fails </exception>
     /// <returns>A Task with the account movements</returns>
     /// </summary>
-    public async Task<AccountMovim> GetAccountMovements(Account account)
+    public async Task<AccountMovim> GetAccountMovements(AccountResponse account)
     {
         var existantMovements = await _openBankApiDbContext.Movim.ToListAsync();
 
@@ -96,22 +116,14 @@ public class AccountRepository : IAccountRepository
         {
             List<Movim> movements = existantMovements.FindAll(mov => mov.AccountId == account.Id).ToList();
 
-            List<MovimResponse> movementsToDTO = new List<MovimResponse>();
-            foreach (Movim movement in movements)
-            {
-                movementsToDTO.Add(new MovimResponse()
-                {
-                    Id = movement.Id,
-                    Amount = movement.Amount,
-                    Created_at = movement.Created_at,
-                    OperationType = movement.OperationType
-                });
-            }
+            List<MovimResponse> movementsDTO = new List<MovimResponse>();
+
+            movements.ForEach(mov => movementsDTO.Add(MovimToDTO(mov)));
 
             AccountMovim accountMovim = new AccountMovim()
             {
                 Account = account,
-                Movimentos = movementsToDTO,
+                Movimentos = movementsDTO,
             };
 
             return accountMovim;
@@ -123,4 +135,31 @@ public class AccountRepository : IAccountRepository
         }
     }
 
+    /// <summary>
+    /// Turns the account model into a DTO to return to the requester
+    /// </summary>
+    private AccountResponse AccountToDTO(Account account)
+    {
+        return new AccountResponse()
+        {
+            Balance = account.Balance,
+            Created_at = account.Created_at,
+            Currency = account.Currency,
+            Id = account.Id
+        };
+    }
+
+    /// <summary>
+    /// Turns the movement model into a DTO to return to the requester
+    /// </summary>
+    private MovimResponse MovimToDTO(Movim movement)
+    {
+        return new MovimResponse()
+        {
+            Id = movement.Id,
+            Amount = movement.Amount,
+            Created_at = movement.Created_at,
+            OperationType = movement.OperationType
+        };
+    }
 }

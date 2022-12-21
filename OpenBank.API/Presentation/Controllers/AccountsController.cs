@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Infrastructure.Interfaces;
 using OpenBank.API.Infrastructure.DTO;
-using OpenBank.API.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 
 namespace OpenBank.API.Controllers;
@@ -53,7 +52,7 @@ public class AccountsController : ControllerBase
 
         try
         {
-            List<Account> result = await _unitOfWork.accountRepository.GetAccounts(userId);
+            List<AccountResponse> result = await _unitOfWork.accountRepository.GetAccounts(userId);
 
             if (result == null || result.Count == 0)
                 return NotFound("This user has no accounts.");
@@ -87,7 +86,7 @@ public class AccountsController : ControllerBase
 
         try
         {
-            Account account = await _unitOfWork.accountRepository.GetAccountById(id, userId);
+            AccountResponse account = await _unitOfWork.accountRepository.GetAccountById(id, userId);
 
             if (account is null)
                 return NotFound("There is no account with this ID");
