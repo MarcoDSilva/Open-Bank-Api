@@ -39,7 +39,7 @@ public class AccountRepository : IAccountRepository
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error {0}", e.Message); //Log erro
+            Console.WriteLine("Error: {0}", e.Message); //Log erro
             throw new Exception("Error while creating the user");
         }
     }
@@ -66,12 +66,12 @@ public class AccountRepository : IAccountRepository
         }
         catch (ForbiddenAccountAccessException e)
         {
-            Console.WriteLine("Error {0}", e.Message); //Log erro
+            Console.WriteLine("Error: {0}", e.Message); //Log erro
             throw new ForbiddenAccountAccessException("Bearer");
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error {0}", e.Message); //Log erro
+            Console.WriteLine("Error: {0}", e.Message); //Log erro
             throw new Exception(e.Message);
         }
     }
@@ -98,7 +98,7 @@ public class AccountRepository : IAccountRepository
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error {0}", e.Message); //Log erro
+            Console.WriteLine("Error: {0}", e.Message); //Log erro
             throw new Exception("Error while obtaining the accounts");
         }
     }
@@ -130,7 +130,7 @@ public class AccountRepository : IAccountRepository
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error {0}", e.Message); //Log erro
+            Console.WriteLine("Error: {0}", e.Message); //Log erro
             throw new Exception(e.Message);
         }
     }

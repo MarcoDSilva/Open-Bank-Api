@@ -13,9 +13,10 @@ public class TokenHandler : ITokenHandler
     private const int EXPIRATION_TIME = 5;
     private readonly ILogger _tokenLogger;
 
-    public TokenHandler(IConfiguration configuration)
+    public TokenHandler(IConfiguration configuration, ILogger tokenLogger)
     {
         _configuration = configuration;
+        _tokenLogger = tokenLogger;
     }
 
     public Task<LoginUserResponse> CreateTokenAsync(LoginUserRequest loginUserRequest, int userId)
