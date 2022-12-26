@@ -1,13 +1,12 @@
 using OpenBank.Api.Data;
-using OpenBank.API.Infrastructure;
-using OpenBank.API.Infrastructure.Interfaces;
-using OpenBank.API.Infrastructure.Repositories;
+using OpenBank.API.Application;
+using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,7 +49,7 @@ builder.Services.AddDbContext<OpenBankApiDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransferRepository, TransferRepository>();
-builder.Services.AddScoped<ITokenHandler, OpenBank.API.Infrastructure.Repositories.TokenHandler>();
+builder.Services.AddScoped<ITokenHandler, OpenBank.API.Application.Repositories.TokenHandler>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAuthentication(option =>

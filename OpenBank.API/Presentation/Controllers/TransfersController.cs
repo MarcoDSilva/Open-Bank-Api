@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OpenBank.API.Infrastructure.DTO;
-using OpenBank.API.Infrastructure.Interfaces;
+using OpenBank.API.Application.DTO;
+using OpenBank.API.Application.Interfaces;
 
 namespace OpenBank.API.Controllers;
 
@@ -33,13 +33,13 @@ public class TransfersController : ControllerBase
 
             switch (result.Item1)
             {
-                case Infrastructure.Enum.StatusCode.Sucess:
+                case Application.Enum.StatusCode.Sucess:
                     return Ok(result.Item2);
-                case Infrastructure.Enum.StatusCode.BadRequest:
+                case Application.Enum.StatusCode.BadRequest:
                     return BadRequest(result.Item2);
-                case Infrastructure.Enum.StatusCode.NotFound:
+                case Application.Enum.StatusCode.NotFound:
                     return NotFound(result.Item2);
-                case Infrastructure.Enum.StatusCode.Forbidden:
+                case Application.Enum.StatusCode.Forbidden:
                     return Forbid(result.Item2);
                 default:
                     return Ok(result.Item2);
