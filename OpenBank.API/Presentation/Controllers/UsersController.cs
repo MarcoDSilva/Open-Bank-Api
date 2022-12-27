@@ -28,6 +28,10 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(IEnumerable<CreateUserRequest>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Users(CreateUserRequest createUser)
     {
         bool usernameAvailable = _unitOfWork.userRepository.IsUsernameAvailable(createUser.Username);
@@ -38,6 +42,7 @@ public class UsersController : ControllerBase
         try
         {
             CreateUserRequest result = await _unitOfWork.userRepository.CreateUser(createUser);
+            result.Password = "";
             return Ok(result);
         }
         catch (Exception e)

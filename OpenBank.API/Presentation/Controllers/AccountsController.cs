@@ -18,6 +18,10 @@ public class AccountsController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(IEnumerable<CreateAccountRequest>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Accounts(CreateAccountRequest accountRequest)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
@@ -40,6 +44,10 @@ public class AccountsController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(List<AccountResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     /// <summary>
     /// Gets all the accounts that the logged in user has
     /// </summary>
@@ -70,6 +78,10 @@ public class AccountsController : ControllerBase
 
     [HttpGet]
     [Route("{id}")]
+    [ProducesResponseType(typeof(IEnumerable<AccountMovim>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
 
     /// <summary>
     /// Get the account and movements associated with the id

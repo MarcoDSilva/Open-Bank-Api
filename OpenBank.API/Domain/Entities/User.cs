@@ -1,12 +1,10 @@
 using System.ComponentModel.DataAnnotations;
+using OpenBank.API.Domain.Common;
 
 namespace OpenBank.API.Domain.Entities;
 
-public class User
+public class User : BaseEntity
 {
-    [Key]
-    public int Id { get; set; }
-
     [Required]
     [StringLength(100)]
     public string Email { get; set; }
@@ -22,7 +20,4 @@ public class User
     [Required]
     [StringLength(50)]
     public string UserName { get; set; }
-
-    [Required]
-    public DateTime CreatedAt { get; set; }
 }

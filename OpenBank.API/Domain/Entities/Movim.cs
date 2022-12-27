@@ -1,22 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using OpenBank.API.Domain.Common;
 
 namespace OpenBank.API.Domain.Entities;
 
-public class Movim
+public class Movim : BaseEntity
 {
-    [Key]
-    public int Id { get; set; }
-
     [Required]
     public string OperationType {get; set;}
 
     [Required]
     [Range(1.0, Double.MaxValue, ErrorMessage = "The field {0} must be greater than {1}.")]
     public decimal Amount { get; set; }
-
-    [Required]
-    public DateTime Created_at { get; set; }
 
     [Required]
     [ForeignKey("Accounts")]

@@ -16,6 +16,10 @@ public class LoginController : ControllerBase
     }
 
     [HttpPost("users/login")]
+    [ProducesResponseType(typeof(IEnumerable<LoginUserResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     ///<summary>
     /// Login request 
     ///</summary>
