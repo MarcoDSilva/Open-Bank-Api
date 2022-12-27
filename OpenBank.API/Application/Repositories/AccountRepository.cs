@@ -16,35 +16,6 @@ public class AccountRepository : IAccountRepository
     }
 
     /// <summary>
-    /// Creates a new account for the user
-    /// <exception>Exception in case something fails </exception>
-    /// <returns>A Task with the request back if succeded the creation</returns>
-    /// </summary>
-    public async Task<CreateAccountRequest> CreateAccount(int idUser, CreateAccountRequest createAccount)
-    {
-        Account account = new Account()
-        {
-            Balance = createAccount.Amount,
-            Created_at = DateTime.UtcNow,
-            Currency = createAccount.Currency,
-            UserId = idUser
-        };
-
-        try
-        {
-            var inserted = await _openBankApiDbContext.Accounts.AddAsync(account);
-            var save = await _openBankApiDbContext.SaveChangesAsync();
-
-            return createAccount;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new Exception("Error while creating the user");
-        }
-    }
-
-    /// <summary>
     /// Gets the account by the selected id
     /// <exception>Exception in case something fails | Forbidden account in case the user is not the owner of the account </exception>
     /// <returns>A Task with the account if the account was found</returns>
@@ -162,4 +133,14 @@ public class AccountRepository : IAccountRepository
             OperationType = movement.OperationType
         };
     }
+
+    public async Task<int> Add(Account account)
+    {
+        var inserted = await _openBankApiDbContext.Accounts.AddAsync(account);
+        var save = await _openBankApiDbContext.SaveChangesAsync();
+        return save;
+    }
+
+    // ======================================== NEW ====================================
+
 }

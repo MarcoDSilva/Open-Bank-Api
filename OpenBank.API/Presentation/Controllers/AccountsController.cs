@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Application.DTO;
 using Microsoft.AspNetCore.Authorization;
+using OpenBank.API.BusinessLogic;
 
 namespace OpenBank.API.Controllers;
 
@@ -11,10 +12,12 @@ namespace OpenBank.API.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly AccountBusinessRules _accountBusinessRules;
 
-    public AccountsController(IUnitOfWork unitOfWork)
+    public AccountsController(IUnitOfWork unitOfWork, AccountBusinessRules accountBusinessRules )
     {
         _unitOfWork = unitOfWork;
+        _accountBusinessRules = accountBusinessRules;
     }
 
     [HttpPost]
@@ -33,8 +36,13 @@ public class AccountsController : ControllerBase
 
         try
         {
-            var result = await _unitOfWork.accountRepository.CreateAccount(userId, accountRequest);
-            return Ok(result);
+            var result = await _accountBusinessRules.CreateAccount(userId, accountRequest);
+
+            if (!result.Item1)
+                return Problem();
+
+            return Ok(result.Item2);
+
         }
         catch (Exception e)
         {

@@ -7,6 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using OpenBank.API.BusinessLogic.Interfaces;
+using OpenBank.API.BusinessLogic;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,11 @@ builder.Services.AddDbContext<OpenBankApiDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+
+builder.Services.AddScoped<IUserBusinessRules, UserBusinessRules>();
+builder.Services.AddScoped<IAccountBusinessRules, AccountBusinessRules>();
+builder.Services.AddScoped<ITransferBusinessRules, TransferBusinessRules>();
+
 builder.Services.AddScoped<ITokenHandler, OpenBank.API.Application.Repositories.TokenHandler>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
