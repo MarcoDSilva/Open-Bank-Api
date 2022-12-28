@@ -4,9 +4,9 @@ using OpenBank.API.Domain.Entities;
 namespace OpenBank.API.BusinessLogic.Interfaces;
 public interface IUserBusinessRules
 {
-    Task<CreateUserRequest> CreateUser(CreateUserRequest createUserRequest);
-    bool IsUsernameAvailable(string username);
-    int IsLoginValid(LoginUserRequest login);
-    IEnumerable<User> GetAllUsers(); // high chance this needs a DTO
+    Task<CreateUserResponse> CreateUser(CreateUserRequest createUserRequest);
+    List<User> GetAllUsers(); 
+    Task<bool> IsUsernameAvailable(string username);
+    Task<int> IsLoginValid(LoginUserRequest login);
 }
 

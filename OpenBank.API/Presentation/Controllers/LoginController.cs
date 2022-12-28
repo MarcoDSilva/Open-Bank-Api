@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Application.DTO;
+using OpenBank.API.BusinessLogic.Interfaces;
 
 namespace OpenBank.API.Controllers;
 
@@ -9,10 +10,12 @@ namespace OpenBank.API.Controllers;
 public class LoginController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IUserBusinessRules _userBusinessRules;
 
-    public LoginController(IUnitOfWork unitOfWork)
+    public LoginController(IUnitOfWork unitOfWork, IUserBusinessRules userBusinessRules)
     {
         _unitOfWork = unitOfWork;
+        _userBusinessRules = userBusinessRules;
     }
 
     [HttpPost("users/login")]
@@ -30,7 +33,7 @@ public class LoginController : ControllerBase
 
         try
         {
-            int userId = _unitOfWork.userRepository.IsLoginValid(loginRequest);
+            int userId = await _userBusinessRules.IsLoginValid(loginRequest);
 
             if (userId > 0)
             {

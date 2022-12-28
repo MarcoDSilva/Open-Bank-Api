@@ -3,6 +3,7 @@ using OpenBank.Api.Data;
 using OpenBank.API.Domain.Entities;
 using OpenBank.API.Application.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace OpenBank.API.Application.Repositories;
 
@@ -15,72 +16,39 @@ public class UserRepository : IUserRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    public async Task<CreateUserRequest> CreateUser(CreateUserRequest createUserRequest)
+    public async Task<CreateUserResponse> CreateUser(User createUser)
     {
-        PasswordHasher<string> pwHasher = new PasswordHasher<string>();
+        var inserted = await _openBankApiDbContext.Users.AddAsync(createUser);
+        var save = await _openBankApiDbContext.SaveChangesAsync();
 
-        User requestToUser = new User()
-        {
-            Email = createUserRequest.Email,
-            FullName = createUserRequest.FullName,
-            Password = pwHasher.HashPassword(createUserRequest.Username, createUserRequest.Password),
-            UserName = createUserRequest.Username,
-            Created_at = DateTime.UtcNow
-        };
-
-        try
-        {
-            var inserted = await _openBankApiDbContext.Users.AddAsync(requestToUser);
-            var save = await _openBankApiDbContext.SaveChangesAsync();
-
-            return createUserRequest;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Error {0}", e.Message); //Log erro
-            throw new Exception("Error while creating the user");
-        }
+        return UserToCreationResponseDTO(inserted.Entity);
     }
 
-    public IEnumerable<User> GetAllUsers()
+    public List<User> GetAllUsers()
     {
         var userList = _openBankApiDbContext.Users.ToList();
         return userList;
     }
 
-    /// <summary>
-    /// Validating the existance of the username that is being inserted
-    /// </summary>
-    /// <returns> true if the username is free
-    public bool IsUsernameAvailable(string username)
+    public async Task<User?> GetUser(string username)
     {
-        var userList = _openBankApiDbContext.Users.ToList();
-        var exists = userList.Find(m => m.UserName.ToLower().Equals(username.ToLower()));
+        List<User> userList = await _openBankApiDbContext.Users.ToListAsync();
+        User? user = userList.Find(m => m.UserName.ToLower().Equals(username.ToLower()));
 
-        return string.IsNullOrEmpty(exists?.UserName);
+        return user;
     }
 
-    public int IsLoginValid(LoginUserRequest login)
+    private CreateUserResponse UserToCreationResponseDTO(User user)
     {
-        try
+        return new CreateUserResponse()
         {
-            var existentUser = _openBankApiDbContext.Users
-                                    .ToList()
-                                    .Find(user => user.UserName.ToLower() == login.UserName.ToLower());
-
-            if (string.IsNullOrWhiteSpace(existentUser?.UserName)) return 0;
-
-            PasswordHasher<string> pwHasher = new PasswordHasher<string>();
-            int validUser = (int)pwHasher.VerifyHashedPassword(
-                                    login.UserName, existentUser.Password, login.Password
-                                );
-
-            return validUser > 0 ? existentUser.Id : 0;
-        }
-        catch (Exception e)
-        {
-            throw new Exception($"Server issues: {e.Message}" );
-        }
+            CreatedAt = user.Created_at,
+            Email = user.Email,
+            FullName = user.FullName,
+            Id = user.Id,
+            PasswordChangedAt = user.Created_at,
+            Username = user.UserName
+        };
     }
 }
 

@@ -1,5 +1,6 @@
-using OpenBank.Api.Data;
+using Microsoft.AspNetCore.Identity;
 using OpenBank.API.Application.DTO;
+using OpenBank.API.Application.Interfaces;
 using OpenBank.API.BusinessLogic.Interfaces;
 using OpenBank.API.Domain.Entities;
 
@@ -7,30 +8,78 @@ namespace OpenBank.API.BusinessLogic;
 
 public class UserBusinessRules : IUserBusinessRules
 {
-    private readonly OpenBankApiDbContext _openBankApiDbContext;
+    private readonly IUnitOfWork _unitOfwork;
 
-    public UserBusinessRules(OpenBankApiDbContext openBankApiDbContext)
+    public UserBusinessRules(IUnitOfWork unitOfwork)
     {
-        _openBankApiDbContext = openBankApiDbContext;
+        _unitOfwork = unitOfwork;
     }
 
-    public Task<CreateUserRequest> CreateUser(CreateUserRequest createUserRequest)
+    public async Task<CreateUserResponse> CreateUser(CreateUserRequest createUserRequest)
     {
-        throw new NotImplementedException();
+        try
+        {
+            PasswordHasher<string> pwHasher = new PasswordHasher<string>();
+
+            User user = new User()
+            {
+                Email = createUserRequest.Email,
+                FullName = createUserRequest.FullName,
+                Password = pwHasher.HashPassword(createUserRequest.Username, createUserRequest.Password),
+                UserName = createUserRequest.Username,
+                Created_at = DateTime.UtcNow
+            };
+
+            CreateUserResponse created = await _unitOfwork.userRepository.CreateUser(user);
+
+            return created;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: {0}", e.Message); //Log erro
+            throw new Exception(e.Message);
+        }
     }
 
-    public IEnumerable<User> GetAllUsers()
+    public List<User> GetAllUsers()
     {
-        throw new NotImplementedException();
+        try
+        {
+            List<User> users = _unitOfwork.userRepository.GetAllUsers();
+            return users;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: {0}", e.Message); //Log erro
+            throw new Exception(e.Message);
+        }
     }
 
-    public int IsLoginValid(LoginUserRequest login)
+    public async Task<int> IsLoginValid(LoginUserRequest login)
     {
-        throw new NotImplementedException();
+        try
+        {
+            User? existentUser = await _unitOfwork.userRepository.GetUser(login.UserName);
+
+            if (string.IsNullOrWhiteSpace(existentUser?.UserName))
+                return 0;
+
+            PasswordHasher<string> pwHasher = new PasswordHasher<string>();
+            int validUser = (int)pwHasher.VerifyHashedPassword(
+                                    login.UserName, existentUser?.Password, login.Password
+                                );
+
+            return validUser > 0 ? existentUser.Id : 0;
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Server issues: {e.Message}");
+        }
     }
 
-    public bool IsUsernameAvailable(string username)
+    public async Task<bool> IsUsernameAvailable(string username)
     {
-        throw new NotImplementedException();
+        User? user = await _unitOfwork.userRepository.GetUser(username);
+        return user?.UserName.ToLower() != username.ToLower();
     }
 }
