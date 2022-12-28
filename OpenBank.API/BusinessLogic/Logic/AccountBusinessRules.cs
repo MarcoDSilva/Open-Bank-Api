@@ -1,6 +1,7 @@
 using OpenBank.Api.Data;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repositories;
 using OpenBank.API.BusinessLogic.Interfaces;
 using OpenBank.API.Domain.Entities;
 
@@ -34,8 +35,7 @@ public class AccountBusinessRules : IAccountBusinessRules
         {
             var newAccountId = await _unitOfWork.accountRepository.Add(account);
 
-            if (newAccountId <= 0) return (false, createAccount);
-            return (true, createAccount);
+            return newAccountId <= 0 ? (false, createAccount) : (true, createAccount);
         }
         catch (Exception e)
         {
@@ -44,18 +44,60 @@ public class AccountBusinessRules : IAccountBusinessRules
         }
     }
 
-    public Task<AccountResponse> GetAccountById(int accountId, int userId)
+    /// <summary>
+    /// Gets the account by the selected id
+    /// <exception>Exception in case something fails | Forbidden account in case the user is not the owner of the account </exception>
+    /// <returns>A Task with the account if the account was found</returns>
+    /// </summary>
+    public async Task<AccountResponse?> GetAccountById(int accountId, int userId)
     {
-        throw new NotImplementedException();
+        bool userOwnsAccount = await _unitOfWork.accountRepository.IsUserAccount(accountId, userId);
+        if (!userOwnsAccount)
+            throw new ForbiddenAccountAccessException("Bearer");
+
+        try
+        {
+            AccountResponse? account = await _unitOfWork.accountRepository.GetById(accountId, userId);
+            return account;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: {0}", e.Message); //Log erro
+            throw new Exception(e.Message);
+        }
     }
 
-    public Task<AccountMovim> GetAccountMovements(AccountResponse account)
+    /// <summary>
+    /// Gets all the accounts for the queried user
+    /// <exception>Exception in case something fails | Forbidden account in case the user is not the owner of the account </exception>
+    /// <returns>List of AccountResponse</returns>
+    /// </summary>
+    public async Task<List<AccountResponse>> GetAccounts(int userId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            List<AccountResponse> accounts = await _unitOfWork.accountRepository.GetAccounts(userId);
+            return accounts;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: {0}", e.Message); //Log erro
+            throw new Exception(e.Message);
+        }
     }
 
-    public Task<List<AccountResponse>> GetAccounts(int userId)
+    public async Task<List<MovimResponse>> GetAccountMovements(int accountId)
     {
-        throw new NotImplementedException();
-    }    
+        try
+        {
+            List<MovimResponse> movements = await _unitOfWork.accountRepository.GetMovements(accountId);
+
+            return movements;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error: {0}", e.Message); //Log erro
+            throw new Exception(e.Message);
+        }
+    }
 }

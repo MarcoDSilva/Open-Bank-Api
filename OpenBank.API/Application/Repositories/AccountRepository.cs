@@ -15,96 +15,70 @@ public class AccountRepository : IAccountRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    /// <summary>
-    /// Gets the account by the selected id
-    /// <exception>Exception in case something fails | Forbidden account in case the user is not the owner of the account </exception>
-    /// <returns>A Task with the account if the account was found</returns>
-    /// </summary>
-    public async Task<AccountResponse> GetAccountById(int accountId, int userId)
+    public async Task<int> Add(Account account)
     {
-        try
-        {
-            List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
-
-            Account? account = accountList.Find(acc => acc.Id == accountId);
-
-            if (account?.UserId != userId)
-                throw new ForbiddenAccountAccessException("Bearer"); // the error has to be issued as bearer for JWT to allow the forbid
-
-            AccountResponse accountDTO = AccountToDTO(account);
-
-            return accountDTO;
-        }
-        catch (ForbiddenAccountAccessException e)
-        {
-            Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new ForbiddenAccountAccessException("Bearer");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new Exception(e.Message);
-        }
+        var inserted = await _openBankApiDbContext.Accounts.AddAsync(account);
+        var save = await _openBankApiDbContext.SaveChangesAsync();
+        return save;
     }
 
 
+    ///<param>accountId - Account identifier</param>
+    ///<param>userId - User identifier</param>
+    /// <summary>
+    /// Gets the queried account to the logged user
+    /// </summary>
+    /// <returns>AccountResponse / empty AccountResponse</returns>
+    public async Task<AccountResponse?> GetById(int accountId, int userId)
+    {
+        List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
+
+        Account? account = accountList.Find(acc => acc.Id == accountId && acc.UserId == userId);
+
+        return account is null ? null : AccountToDTO(account);
+    }
+
+    ///<param>userId - User identifier</param>
     /// <summary>
     /// Gets all the accounts belonging to the user
-    /// <exception>Exception in case something fails </exception>
     /// <returns>A Task with a list of accounts</returns>
     /// </summary>
     public async Task<List<AccountResponse>> GetAccounts(int userId)
     {
         List<Account> existantAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
+        List<Account> userAccounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList();
 
-        try
-        {
-            List<Account> userAccounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList();
+        List<AccountResponse> accountResponses = new List<AccountResponse>();
 
-            List<AccountResponse> accountResponses = new List<AccountResponse>();
-
-            userAccounts.ForEach(acc => accountResponses.Add(AccountToDTO(acc)));
-
-            return accountResponses;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new Exception("Error while obtaining the accounts");
-        }
+        userAccounts.ForEach(acc => accountResponses.Add(AccountToDTO(acc)));
+        return accountResponses;
     }
 
+    ///<param>accountId - Account identifier</param>
     /// <summary>
     /// Gets all the account movements belonging to the account
-    /// <exception>Exception in case something fails </exception>
-    /// <returns>A Task with the account movements</returns>
+    /// <returns>A list with the account movements</returns>
     /// </summary>
-    public async Task<AccountMovim> GetAccountMovements(AccountResponse account)
+    public async Task<List<MovimResponse>> GetMovements(int accountId)
     {
         var existantMovements = await _openBankApiDbContext.Movim.ToListAsync();
 
-        try
-        {
-            List<Movim> movements = existantMovements.FindAll(mov => mov.AccountId == account.Id).ToList();
+        List<Movim> movements = existantMovements.FindAll(mov => mov.AccountId == accountId).ToList();
+        List<MovimResponse> movementsDTO = new List<MovimResponse>();
 
-            List<MovimResponse> movementsDTO = new List<MovimResponse>();
+        movements.ForEach(mov => movementsDTO.Add(MovimToDTO(mov)));
 
-            movements.ForEach(mov => movementsDTO.Add(MovimToDTO(mov)));
-
-            AccountMovim accountMovim = new AccountMovim()
-            {
-                Account = account,
-                Movimentos = movementsDTO,
-            };
-
-            return accountMovim;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new Exception(e.Message);
-        }
+        return movementsDTO;
     }
+
+    public async Task<bool> IsUserAccount(int accountId, int userId)
+    {
+        List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
+        Account? account = accountList.Find(acc => acc.Id == accountId);
+        return account?.UserId == userId;
+    }
+
+    // ============= MAPPERS =================
 
     /// <summary>
     /// Turns the account model into a DTO to return to the requester
@@ -133,14 +107,4 @@ public class AccountRepository : IAccountRepository
             OperationType = movement.OperationType
         };
     }
-
-    public async Task<int> Add(Account account)
-    {
-        var inserted = await _openBankApiDbContext.Accounts.AddAsync(account);
-        var save = await _openBankApiDbContext.SaveChangesAsync();
-        return save;
-    }
-
-    // ======================================== NEW ====================================
-
 }

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Application.DTO;
 using Microsoft.AspNetCore.Authorization;
-using OpenBank.API.BusinessLogic;
+using OpenBank.API.BusinessLogic.Interfaces;
 
 namespace OpenBank.API.Controllers;
 
@@ -12,9 +12,9 @@ namespace OpenBank.API.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly AccountBusinessRules _accountBusinessRules;
+    private readonly IAccountBusinessRules _accountBusinessRules;
 
-    public AccountsController(IUnitOfWork unitOfWork, AccountBusinessRules accountBusinessRules )
+    public AccountsController(IUnitOfWork unitOfWork, IAccountBusinessRules accountBusinessRules)
     {
         _unitOfWork = unitOfWork;
         _accountBusinessRules = accountBusinessRules;
@@ -38,11 +38,7 @@ public class AccountsController : ControllerBase
         {
             var result = await _accountBusinessRules.CreateAccount(userId, accountRequest);
 
-            if (!result.Item1)
-                return Problem();
-
-            return Ok(result.Item2);
-
+            return !result.Item1 ? Problem() : Ok(result.Item2);
         }
         catch (Exception e)
         {
@@ -69,7 +65,7 @@ public class AccountsController : ControllerBase
 
         try
         {
-            List<AccountResponse> result = await _unitOfWork.accountRepository.GetAccounts(userId);
+            List<AccountResponse> result = await _accountBusinessRules.GetAccounts(userId);
 
             if (result == null || result.Count == 0)
                 return NotFound("This user has no accounts.");
@@ -108,19 +104,24 @@ public class AccountsController : ControllerBase
 
         try
         {
-            AccountResponse account = await _unitOfWork.accountRepository.GetAccountById(id, userId);
+            AccountResponse? account = await _accountBusinessRules.GetAccountById(id, userId);
 
             if (account is null)
                 return NotFound("There is no account with this ID");
 
-            AccountMovim accountWithMovements = await _unitOfWork.accountRepository.GetAccountMovements(account);
+            List<MovimResponse> movements = await _accountBusinessRules.GetAccountMovements(account.Id);            
+            AccountMovim accountWithMovements = new AccountMovim()
+            {
+                Account = account,
+                Movimentos = movements
+            };
 
             return Ok(accountWithMovements);
         }
         catch (ForbiddenAccountAccessException ex)
         {
-            _unitOfWork.loggerHandler.Log(LogLevel.Information, $"Exception caught on controller Accounts with the message: {ex.Message}");
-            return Forbid(ex.Message);
+            _unitOfWork.loggerHandler.Log(LogLevel.Information, $"Forbidden user: {ex.Message}");
+            return Forbid("Bearer");
         }
         catch (Exception e)
         {
