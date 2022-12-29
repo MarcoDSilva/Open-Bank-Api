@@ -53,10 +53,10 @@ public class TransferBusinessRules : ITransferBusinessRules
         {
             _unitOfWork.accountRepository.Update(accountFrom);
             _unitOfWork.accountRepository.Update(accountTo);
-            var accountFromResult = await _unitOfWork.TransferRepository.AddAsync(accountFromMovement);
-            var accountToResult = await _unitOfWork.TransferRepository.AddAsync(accountToMovement);
+            var accountFromResult = await _unitOfWork.transferRepository.AddAsync(accountFromMovement);
+            var accountToResult = await _unitOfWork.transferRepository.AddAsync(accountToMovement);
 
-            bool isSaved = await _unitOfWork.TransferRepository.SaveAsync();
+            bool isSaved = await _unitOfWork.transferRepository.SaveAsync();
 
             if (isSaved)
                 return (StatusCode.Sucess, "Transfer was completed with success");
