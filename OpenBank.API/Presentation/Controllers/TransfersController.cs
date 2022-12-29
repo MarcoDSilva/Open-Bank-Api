@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
+using OpenBank.API.BusinessLogic.Interfaces;
 
 namespace OpenBank.API.Controllers;
 
@@ -12,10 +13,12 @@ public class TransfersController : ControllerBase
 {
 
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ITransferBusinessRules _transferBusinessRules;
 
-    public TransfersController(IUnitOfWork unitOfWork)
+    public TransfersController(IUnitOfWork unitOfWork, ITransferBusinessRules transferBusinessRules)
     {
         _unitOfWork = unitOfWork;
+        _transferBusinessRules = transferBusinessRules;
     }
 
     [HttpPost]
@@ -33,7 +36,7 @@ public class TransfersController : ControllerBase
 
         try
         {
-            var result = await _unitOfWork.transferRepository.TransferRequestAsync(transferRequest, userId);
+            var result = await _transferBusinessRules.TransferRequestAsync(transferRequest, userId);
 
             switch (result.Item1)
             {

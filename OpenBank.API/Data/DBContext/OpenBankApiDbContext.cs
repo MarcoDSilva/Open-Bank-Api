@@ -11,5 +11,5 @@ public class OpenBankApiDbContext : DbContext
 
     public DbSet<User> Users {get; set;}
     public DbSet<Account> Accounts {get; set;}
-    public DbSet<Movim> Movim {get; set;}    
+    public DbSet<Transfer> Transfers {get; set;}    
 }

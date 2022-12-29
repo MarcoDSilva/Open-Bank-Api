@@ -4,7 +4,7 @@ public interface IUnitOfWork
 {
     IUserRepository userRepository { get; }
     IAccountRepository accountRepository { get; }
-    ITransferRepository transferRepository { get; }
+    ITransferRepository TransferRepository { get; }
     ITokenHandler tokenHandler { get; }
     ILogger<Object> loggerHandler {get; }
 }

@@ -4,7 +4,7 @@ using OpenBank.API.Domain.Common;
 
 namespace OpenBank.API.Domain.Entities;
 
-public class Movim : BaseEntity
+public class Transfer : BaseEntity
 {
     [Required]
     public string OperationType {get; set;}

@@ -5,9 +5,12 @@ namespace OpenBank.API.Application.Interfaces;
 
 public interface IAccountRepository
 {
-    Task<List<AccountResponse>> GetAccounts(int userId);
     Task<int> Add(Account account);
-    Task<AccountResponse?> GetById(int accountId, int userId);
+    void Update(Account account);
+    Task<Account?> GetById(int accountId);
+    Task<List<AccountResponse>> GetAccounts(int userId);
     Task<bool> IsUserAccount(int accountId, int userId);
     Task<List<MovimResponse>> GetMovements(int accountId);
+    Task<AccountResponse?> GetById(int accountId, int userId);
+
 }

@@ -51,8 +51,8 @@ public class AccountBusinessRules : IAccountBusinessRules
     /// </summary>
     public async Task<AccountResponse?> GetAccountById(int accountId, int userId)
     {
-        bool userOwnsAccount = await _unitOfWork.accountRepository.IsUserAccount(accountId, userId);
-        if (!userOwnsAccount)
+        bool isUserAccount = await _unitOfWork.accountRepository.IsUserAccount(accountId, userId);
+        if (!isUserAccount)
             throw new ForbiddenAccountAccessException("Bearer");
 
         try

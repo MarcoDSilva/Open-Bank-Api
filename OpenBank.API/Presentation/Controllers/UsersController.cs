@@ -37,9 +37,9 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Users(CreateUserRequest createUser)
     {
-        bool usernameAvailable = await _userBusinessRules.IsUsernameAvailable(createUser.Username);
+        bool isUsernameAvailable = await _userBusinessRules.IsUsernameAvailable(createUser.Username);
 
-        if (!usernameAvailable)
+        if (!isUsernameAvailable)
             return BadRequest($"Username {createUser.Username} already in use, please register with a different username.");
 
         try

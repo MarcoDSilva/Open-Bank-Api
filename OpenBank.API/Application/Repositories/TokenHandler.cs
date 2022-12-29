@@ -10,7 +10,7 @@ namespace OpenBank.API.Application.Repositories;
 public class TokenHandler : ITokenHandler
 {
     private readonly IConfiguration _configuration;
-    private const int EXPIRATION_TIME = 5;
+    private const int ExpirationTime = 5;
 
     public TokenHandler(IConfiguration configuration)
     {
@@ -19,7 +19,7 @@ public class TokenHandler : ITokenHandler
 
     public Task<LoginUserResponse> CreateTokenAsync(LoginUserRequest loginUserRequest, int userId)
     {
-        DateTime expirationDate = DateTime.UtcNow.AddMinutes(EXPIRATION_TIME);
+        DateTime expirationDate = DateTime.UtcNow.AddMinutes(ExpirationTime);
 
         List<Claim> claims = new List<Claim>()
         {

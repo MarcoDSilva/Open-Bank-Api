@@ -1,9 +1,9 @@
-using OpenBank.API.Application.DTO;
-using OpenBank.API.Application.Enum;
+using OpenBank.API.Domain.Entities;
 
 namespace OpenBank.API.Application.Interfaces;
 
 public interface ITransferRepository 
 {
-    Task<(StatusCode,string)> TransferRequestAsync(TransferRequest transfer, int userId);
+    Task<Transfer> AddAsync(Transfer transfer);
+    Task<bool> SaveAsync();
 }

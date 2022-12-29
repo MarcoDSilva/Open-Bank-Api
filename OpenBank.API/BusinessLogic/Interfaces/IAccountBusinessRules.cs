@@ -1,4 +1,6 @@
 using OpenBank.API.Application.DTO;
+using OpenBank.API.Domain.Entities;
+
 namespace OpenBank.API.BusinessLogic.Interfaces;
 
 public interface IAccountBusinessRules

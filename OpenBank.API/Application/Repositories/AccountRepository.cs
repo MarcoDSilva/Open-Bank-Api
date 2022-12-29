@@ -38,6 +38,15 @@ public class AccountRepository : IAccountRepository
         return account is null ? null : AccountToDTO(account);
     }
 
+    public async Task<Account?> GetById(int accountId)
+    {
+        List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
+
+        Account? account = accountList.Find(acc => acc.Id == accountId);
+
+        return account is null ? null : account;
+    }
+
     ///<param>userId - User identifier</param>
     /// <summary>
     /// Gets all the accounts belonging to the user
@@ -61,12 +70,12 @@ public class AccountRepository : IAccountRepository
     /// </summary>
     public async Task<List<MovimResponse>> GetMovements(int accountId)
     {
-        var existantMovements = await _openBankApiDbContext.Movim.ToListAsync();
+        var existantMovements = await _openBankApiDbContext.Transfers.ToListAsync();
 
-        List<Movim> movements = existantMovements.FindAll(mov => mov.AccountId == accountId).ToList();
+        List<Transfer> movements = existantMovements.FindAll(mov => mov.AccountId == accountId).ToList();
         List<MovimResponse> movementsDTO = new List<MovimResponse>();
 
-        movements.ForEach(mov => movementsDTO.Add(MovimToDTO(mov)));
+        movements.ForEach(mov => movementsDTO.Add(TransferToDTO(mov)));
 
         return movementsDTO;
     }
@@ -78,6 +87,11 @@ public class AccountRepository : IAccountRepository
         return account?.UserId == userId;
     }
 
+    public void Update(Account account)
+    {
+        _openBankApiDbContext.Accounts.Update(account);
+    }
+    
     // ============= MAPPERS =================
 
     /// <summary>
@@ -97,7 +111,7 @@ public class AccountRepository : IAccountRepository
     /// <summary>
     /// Turns the movement model into a DTO to return to the requester
     /// </summary>
-    private MovimResponse MovimToDTO(Movim movement)
+    private MovimResponse TransferToDTO(Transfer movement)
     {
         return new MovimResponse()
         {
