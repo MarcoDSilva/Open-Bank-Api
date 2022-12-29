@@ -55,7 +55,7 @@ public class UserBusinessRules : IUserBusinessRules
         }
     }
 
-    public async Task<int> IsLoginValid(LoginUserRequest login)
+    public async Task<int> GetUserId(LoginUserRequest login)
     {
         try
         {

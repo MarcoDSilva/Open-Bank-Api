@@ -33,7 +33,7 @@ public class LoginController : ControllerBase
 
         try
         {
-            int userId = await _userBusinessRules.IsLoginValid(loginRequest);
+            int userId = await _userBusinessRules.GetUserId(loginRequest);
 
             if (userId > 0)
             {

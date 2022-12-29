@@ -7,6 +7,6 @@ public interface IUserBusinessRules
     Task<CreateUserResponse> CreateUser(CreateUserRequest createUserRequest);
     List<User> GetAllUsers(); 
     Task<bool> IsUsernameAvailable(string username);
-    Task<int> IsLoginValid(LoginUserRequest login);
+    Task<int> GetUserId(LoginUserRequest login);
 }
 
