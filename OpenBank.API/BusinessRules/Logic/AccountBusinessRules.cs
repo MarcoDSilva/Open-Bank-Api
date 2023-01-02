@@ -1,11 +1,9 @@
-using OpenBank.Api.Data;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
-using OpenBank.API.Application.Repositories;
-using OpenBank.API.BusinessLogic.Interfaces;
+using OpenBank.API.BusinessRules.Interfaces;
 using OpenBank.API.Domain.Entities;
 
-namespace OpenBank.API.BusinessLogic;
+namespace OpenBank.API.BusinessRules;
 
 public class AccountBusinessRules : IAccountBusinessRules
 {

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
-using OpenBank.API.BusinessLogic.Interfaces;
+using OpenBank.API.BusinessRules.Interfaces;
 
 namespace OpenBank.API.Controllers;
 

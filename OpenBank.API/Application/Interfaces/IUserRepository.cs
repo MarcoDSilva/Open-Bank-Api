@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore.Internal;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Domain.Entities;
 

@@ -2,7 +2,6 @@ using OpenBank.API.Application.DTO;
 using OpenBank.Api.Data;
 using OpenBank.API.Domain.Entities;
 using OpenBank.API.Application.Interfaces;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace OpenBank.API.Application.Repositories;

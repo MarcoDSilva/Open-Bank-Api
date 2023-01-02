@@ -1,7 +1,7 @@
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Enum;
 
-namespace OpenBank.API.BusinessLogic.Interfaces;
+namespace OpenBank.API.BusinessRules.Interfaces;
 
 public interface ITransferBusinessRules
 {

@@ -7,8 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using OpenBank.API.BusinessLogic.Interfaces;
-using OpenBank.API.BusinessLogic;
+using OpenBank.API.BusinessRules.Interfaces;
+using OpenBank.API.BusinessRules;
 
 var builder = WebApplication.CreateBuilder(args);
 

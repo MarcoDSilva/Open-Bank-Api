@@ -2,10 +2,10 @@ using OpenBank.Api.Application.Shared;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Enum;
 using OpenBank.API.Application.Interfaces;
-using OpenBank.API.BusinessLogic.Interfaces;
+using OpenBank.API.BusinessRules.Interfaces;
 using OpenBank.API.Domain.Entities;
 
-namespace OpenBank.API.BusinessLogic;
+namespace OpenBank.API.BusinessRules;
 
 public class TransferBusinessRules : ITransferBusinessRules
 {
