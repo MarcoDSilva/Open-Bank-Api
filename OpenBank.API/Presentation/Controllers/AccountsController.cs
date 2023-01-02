@@ -82,7 +82,7 @@ public class AccountsController : ControllerBase
 
     [HttpGet]
     [Route("{id}")]
-    [ProducesResponseType(typeof(IEnumerable<AccountMovim>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IEnumerable<AccountMovement>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -109,11 +109,11 @@ public class AccountsController : ControllerBase
             if (account is null)
                 return NotFound("There is no account with this ID");
 
-            List<MovimResponse> movements = await _accountBusinessRules.GetAccountMovements(account.Id);            
-            AccountMovim accountWithMovements = new AccountMovim()
+            List<MovementResponse> movements = await _accountBusinessRules.GetAccountMovements(account.Id);            
+            AccountMovement accountWithMovements = new AccountMovement()
             {
                 Account = account,
-                Movimentos = movements
+                Movements = movements
             };
 
             return Ok(accountWithMovements);

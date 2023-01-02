@@ -15,7 +15,7 @@ public class AccountRepository : IAccountRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    public async Task<int> Add(Account account)
+    public async Task<int> AddAsync(Account account)
     {
         var inserted = await _openBankApiDbContext.Accounts.AddAsync(account);
         var save = await _openBankApiDbContext.SaveChangesAsync();
@@ -29,13 +29,13 @@ public class AccountRepository : IAccountRepository
     /// Gets the queried account to the logged user
     /// </summary>
     /// <returns>AccountResponse / empty AccountResponse</returns>
-    public async Task<AccountResponse?> GetById(int accountId, int userId)
+    public async Task<Account?> GetById(int accountId, int userId)
     {
         List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
 
         Account? account = accountList.Find(acc => acc.Id == accountId && acc.UserId == userId);
 
-        return account is null ? null : AccountToDTO(account);
+        return account is null ? null : account;
     }
 
     public async Task<Account?> GetById(int accountId)
@@ -52,15 +52,11 @@ public class AccountRepository : IAccountRepository
     /// Gets all the accounts belonging to the user
     /// <returns>A Task with a list of accounts</returns>
     /// </summary>
-    public async Task<List<AccountResponse>> GetAccounts(int userId)
+    public async Task<List<Account>> GetAccounts(int userId)
     {
         List<Account> existantAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
-        List<Account> userAccounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList();
-
-        List<AccountResponse> accountResponses = new List<AccountResponse>();
-
-        userAccounts.ForEach(acc => accountResponses.Add(AccountToDTO(acc)));
-        return accountResponses;
+        List<Account> userAccounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList();     
+        return userAccounts;
     }
 
     ///<param>accountId - Account identifier</param>
@@ -68,16 +64,16 @@ public class AccountRepository : IAccountRepository
     /// Gets all the account movements belonging to the account
     /// <returns>A list with the account movements</returns>
     /// </summary>
-    public async Task<List<MovimResponse>> GetMovements(int accountId)
+    public async Task<List<Transfer>> GetMovements(int accountId)
     {
         var existantMovements = await _openBankApiDbContext.Transfers.ToListAsync();
 
         List<Transfer> movements = existantMovements.FindAll(mov => mov.AccountId == accountId).ToList();
-        List<MovimResponse> movementsDTO = new List<MovimResponse>();
+        // List<MovementResponse> movementsDTO = new List<MovementResponse>();
 
-        movements.ForEach(mov => movementsDTO.Add(TransferToDTO(mov)));
+        // movements.ForEach(mov => movementsDTO.Add(TransferToDTO(mov)));
 
-        return movementsDTO;
+        return movements;
     }
 
     public async Task<bool> IsUserAccount(int accountId, int userId)
@@ -90,35 +86,5 @@ public class AccountRepository : IAccountRepository
     public void Update(Account account)
     {
         _openBankApiDbContext.Accounts.Update(account);
-    }
-    
-    // ============= MAPPERS =================
-
-    /// <summary>
-    /// Turns the account model into a DTO to return to the requester
-    /// </summary>
-    private AccountResponse AccountToDTO(Account account)
-    {
-        return new AccountResponse()
-        {
-            Balance = account.Balance,
-            Created_at = account.Created_at,
-            Currency = account.Currency,
-            Id = account.Id
-        };
-    }
-
-    /// <summary>
-    /// Turns the movement model into a DTO to return to the requester
-    /// </summary>
-    private MovimResponse TransferToDTO(Transfer movement)
-    {
-        return new MovimResponse()
-        {
-            Id = movement.Id,
-            Amount = movement.Amount,
-            Created_at = movement.Created_at,
-            OperationType = movement.OperationType
-        };
-    }
+    }  
 }

@@ -1,6 +1,6 @@
 namespace OpenBank.API.Application.DTO;
 
-public class MovimResponse
+public class MovementResponse
 {
     public int Id { get; set; }
     public decimal Amount { get; set; }

@@ -12,8 +12,8 @@ using OpenBank.Api.Data;
 namespace OpenBank.API.Migrations
 {
     [DbContext(typeof(OpenBankApiDbContext))]
-    [Migration("20221229153453_renaming table 2")]
-    partial class renamingtable2
+    [Migration("20230102171629_updated migration")]
+    partial class updatedmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

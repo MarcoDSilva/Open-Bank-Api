@@ -1,3 +1,4 @@
+using AutoMapper;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.BusinessRules.Interfaces;
@@ -8,10 +9,12 @@ namespace OpenBank.API.BusinessRules;
 public class AccountBusinessRules : IAccountBusinessRules
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-    public AccountBusinessRules(IUnitOfWork unitOfWork)
+    public AccountBusinessRules(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -31,7 +34,7 @@ public class AccountBusinessRules : IAccountBusinessRules
 
         try
         {
-            var newAccountId = await _unitOfWork.accountRepository.Add(account);
+            var newAccountId = await _unitOfWork.accountRepository.AddAsync(account);
 
             return newAccountId <= 0 ? (false, createAccount) : (true, createAccount);
         }
@@ -55,8 +58,9 @@ public class AccountBusinessRules : IAccountBusinessRules
 
         try
         {
-            AccountResponse? account = await _unitOfWork.accountRepository.GetById(accountId, userId);
-            return account;
+            Account? account = await _unitOfWork.accountRepository.GetById(accountId, userId);
+
+            return account != null ? _mapper.Map<Account, AccountResponse>(account) : null;
         }
         catch (Exception e)
         {
@@ -74,8 +78,12 @@ public class AccountBusinessRules : IAccountBusinessRules
     {
         try
         {
-            List<AccountResponse> accounts = await _unitOfWork.accountRepository.GetAccounts(userId);
-            return accounts;
+            List<Account> accounts = await _unitOfWork.accountRepository.GetAccounts(userId);
+            List<AccountResponse> accountResponseDTO = new List<AccountResponse>();
+
+            accounts.ForEach(acc => accountResponseDTO.Add(_mapper.Map<Account, AccountResponse>(acc)));
+
+            return accountResponseDTO;
         }
         catch (Exception e)
         {
@@ -84,13 +92,17 @@ public class AccountBusinessRules : IAccountBusinessRules
         }
     }
 
-    public async Task<List<MovimResponse>> GetAccountMovements(int accountId)
+    public async Task<List<MovementResponse>> GetAccountMovements(int accountId)
     {
         try
         {
-            List<MovimResponse> movements = await _unitOfWork.accountRepository.GetMovements(accountId);
+            List<Transfer> movements = await _unitOfWork.accountRepository.GetMovements(accountId);
 
-            return movements;
+            List<MovementResponse> movementDTO = new List<MovementResponse>();
+
+            movements.ForEach(mov => movementDTO.Add(_mapper.Map<Transfer, MovementResponse>(mov)));
+
+            return movementDTO;
         }
         catch (Exception e)
         {

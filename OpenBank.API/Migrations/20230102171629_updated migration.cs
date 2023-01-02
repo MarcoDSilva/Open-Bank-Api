@@ -5,7 +5,7 @@
 namespace OpenBank.API.Migrations
 {
     /// <inheritdoc />
-    public partial class secondMigration : Migration
+    public partial class updatedmigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
