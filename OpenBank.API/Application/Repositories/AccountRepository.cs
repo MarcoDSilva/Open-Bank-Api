@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OpenBank.Api.Data;
 using OpenBank.API.Domain.Entities;
-using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
 
 namespace OpenBank.API.Application.Repositories;
@@ -29,19 +28,17 @@ public class AccountRepository : IAccountRepository
     /// Gets the queried account to the logged user
     /// </summary>
     /// <returns>AccountResponse / empty AccountResponse</returns>
-    public async Task<Account?> GetById(int accountId, int userId)
+    public async Task<Account?> GetByIdAsync(int accountId, int userId)
     {
         List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
-
         Account? account = accountList.Find(acc => acc.Id == accountId && acc.UserId == userId);
 
         return account is null ? null : account;
     }
 
-    public async Task<Account?> GetById(int accountId)
+    public async Task<Account?> GetByIdAsync(int accountId)
     {
         List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
-
         Account? account = accountList.Find(acc => acc.Id == accountId);
 
         return account is null ? null : account;
@@ -52,10 +49,11 @@ public class AccountRepository : IAccountRepository
     /// Gets all the accounts belonging to the user
     /// <returns>A Task with a list of accounts</returns>
     /// </summary>
-    public async Task<List<Account>> GetAccounts(int userId)
+    public async Task<List<Account>> GetAccountsAsync(int userId)
     {
         List<Account> existantAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
-        List<Account> userAccounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList();     
+        List<Account> userAccounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList(); 
+            
         return userAccounts;
     }
 
@@ -64,22 +62,19 @@ public class AccountRepository : IAccountRepository
     /// Gets all the account movements belonging to the account
     /// <returns>A list with the account movements</returns>
     /// </summary>
-    public async Task<List<Transfer>> GetMovements(int accountId)
+    public async Task<List<Transfer>> GetAccountMovementsAsync(int accountId)
     {
         var existantMovements = await _openBankApiDbContext.Transfers.ToListAsync();
-
-        List<Transfer> movements = existantMovements.FindAll(mov => mov.AccountId == accountId).ToList();
-        // List<MovementResponse> movementsDTO = new List<MovementResponse>();
-
-        // movements.ForEach(mov => movementsDTO.Add(TransferToDTO(mov)));
+        List<Transfer> movements = existantMovements.FindAll(mov => mov.AccountId == accountId).ToList();      
 
         return movements;
     }
 
-    public async Task<bool> IsUserAccount(int accountId, int userId)
-    {
+    public async Task<bool> IsUserAccountAsync(int accountId, int userId)
+    {        
         List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
         Account? account = accountList.Find(acc => acc.Id == accountId);
+
         return account?.UserId == userId;
     }
 

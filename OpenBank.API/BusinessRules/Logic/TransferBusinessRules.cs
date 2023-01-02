@@ -18,8 +18,8 @@ public class TransferBusinessRules : ITransferBusinessRules
 
     public async Task<(StatusCode, string)> TransferRequestAsync(TransferRequest transfer, int userId)
     {
-        Account? accountFrom = await _unitOfWork.accountRepository.GetById(transfer.From_account);
-        Account? accountTo = await _unitOfWork.accountRepository.GetById(transfer.To_account);
+        Account? accountFrom = await _unitOfWork.accountRepository.GetByIdAsync(transfer.From_account);
+        Account? accountTo = await _unitOfWork.accountRepository.GetByIdAsync(transfer.To_account);
 
         // validation
         (StatusCode, string) validation = ValidateAccountsForTransfer(accountFrom, accountTo, transfer, userId);

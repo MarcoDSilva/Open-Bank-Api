@@ -15,12 +15,13 @@ public class UserRepository : IUserRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    public async Task<CreateUserResponse> CreateUser(User createUser)
+    public async Task<User> CreateUserAsync(User createUser)
     {
         var inserted = await _openBankApiDbContext.Users.AddAsync(createUser);
         var save = await _openBankApiDbContext.SaveChangesAsync();
 
-        return UserToCreationResponseDTO(inserted.Entity);
+        //return UserToCreationResponseDTO(inserted.Entity);
+        return inserted.Entity;
     }
 
     public List<User> GetAllUsers()
@@ -29,25 +30,12 @@ public class UserRepository : IUserRepository
         return userList;
     }
 
-    public async Task<User?> GetUser(string username)
+    public async Task<User?> GetUserAsync(string username)
     {
         List<User> userList = await _openBankApiDbContext.Users.ToListAsync();
         User? user = userList.Find(m => m.UserName.ToLower().Equals(username.ToLower()));
 
         return user;
-    }
-
-    private CreateUserResponse UserToCreationResponseDTO(User user)
-    {
-        return new CreateUserResponse()
-        {
-            CreatedAt = user.Created_at,
-            Email = user.Email,
-            FullName = user.FullName,
-            Id = user.Id,
-            PasswordChangedAt = user.Created_at,
-            Username = user.UserName
-        };
     }
 }
 

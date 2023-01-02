@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
@@ -9,13 +10,15 @@ namespace OpenBank.API.BusinessRules;
 public class UserBusinessRules : IUserBusinessRules
 {
     private readonly IUnitOfWork _unitOfwork;
+    private readonly IMapper _mapper;
 
-    public UserBusinessRules(IUnitOfWork unitOfwork)
+    public UserBusinessRules(IUnitOfWork unitOfwork, IMapper mapper)
     {
         _unitOfwork = unitOfwork;
+        _mapper = mapper;
     }
 
-    public async Task<CreateUserResponse> CreateUser(CreateUserRequest createUserRequest)
+    public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest createUserRequest)
     {
         try
         {
@@ -30,9 +33,10 @@ public class UserBusinessRules : IUserBusinessRules
                 Created_at = DateTime.UtcNow
             };
 
-            CreateUserResponse created = await _unitOfwork.userRepository.CreateUser(user);
+            User created = await _unitOfwork.userRepository.CreateUserAsync(user);
+            CreateUserResponse userDTO = _mapper.Map<User, CreateUserResponse>(created);
 
-            return created;
+            return userDTO;
         }
         catch (Exception e)
         {
@@ -55,11 +59,11 @@ public class UserBusinessRules : IUserBusinessRules
         }
     }
 
-    public async Task<int> GetUserId(LoginUserRequest login)
+    public async Task<int> GetUserIdAsync(LoginUserRequest login)
     {
         try
         {
-            User? existentUser = await _unitOfwork.userRepository.GetUser(login.UserName);
+            User? existentUser = await _unitOfwork.userRepository.GetUserAsync(login.UserName);
 
             if (string.IsNullOrWhiteSpace(existentUser?.UserName))
                 return 0;
@@ -77,9 +81,9 @@ public class UserBusinessRules : IUserBusinessRules
         }
     }
 
-    public async Task<bool> IsUsernameAvailable(string username)
+    public async Task<bool> IsUsernameAvailableAsync(string username)
     {
-        User? user = await _unitOfwork.userRepository.GetUser(username);
+        User? user = await _unitOfwork.userRepository.GetUserAsync(username);
         return user?.UserName.ToLower() != username.ToLower();
     }
 }

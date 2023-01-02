@@ -9,7 +9,8 @@ public class DtoMapper : Profile
     {
         CreateMap<Account, AccountResponse>();
         CreateMap<Transfer, MovementResponse>().ReverseMap();
-       
-
+        CreateMap<User, CreateUserResponse>()
+            .ForMember(target => target.PasswordChangedAt, options => options
+                .MapFrom(r => r.Created_at));
     }
 }

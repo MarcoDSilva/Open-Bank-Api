@@ -8,10 +8,9 @@ public interface IAccountRepository
     Task<int> AddAsync(Account account);
     void Update(Account account);
 
-    Task<Account?> GetById(int accountId);
-    Task<List<Account>> GetAccounts(int userId);
-    Task<bool> IsUserAccount(int accountId, int userId);
-    Task<List<Transfer>> GetMovements(int accountId);
-    Task<Account?> GetById(int accountId, int userId);
-
+    Task<Account?> GetByIdAsync(int accountId);
+    Task<Account?> GetByIdAsync(int accountId, int userId);
+    Task<List<Account>> GetAccountsAsync(int userId);
+    Task<bool> IsUserAccountAsync(int accountId, int userId);
+    Task<List<Transfer>> GetAccountMovementsAsync(int accountId);
 }

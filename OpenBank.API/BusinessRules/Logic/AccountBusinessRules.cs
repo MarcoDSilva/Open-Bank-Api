@@ -52,13 +52,13 @@ public class AccountBusinessRules : IAccountBusinessRules
     /// </summary>
     public async Task<AccountResponse?> GetAccountById(int accountId, int userId)
     {
-        bool isUserAccount = await _unitOfWork.accountRepository.IsUserAccount(accountId, userId);
+        bool isUserAccount = await _unitOfWork.accountRepository.IsUserAccountAsync(accountId, userId);
         if (!isUserAccount)
             throw new ForbiddenAccountAccessException("Bearer");
 
         try
         {
-            Account? account = await _unitOfWork.accountRepository.GetById(accountId, userId);
+            Account? account = await _unitOfWork.accountRepository.GetByIdAsync(accountId, userId);
 
             return account != null ? _mapper.Map<Account, AccountResponse>(account) : null;
         }
@@ -78,7 +78,7 @@ public class AccountBusinessRules : IAccountBusinessRules
     {
         try
         {
-            List<Account> accounts = await _unitOfWork.accountRepository.GetAccounts(userId);
+            List<Account> accounts = await _unitOfWork.accountRepository.GetAccountsAsync(userId);
             List<AccountResponse> accountResponseDTO = new List<AccountResponse>();
 
             accounts.ForEach(acc => accountResponseDTO.Add(_mapper.Map<Account, AccountResponse>(acc)));
@@ -96,7 +96,7 @@ public class AccountBusinessRules : IAccountBusinessRules
     {
         try
         {
-            List<Transfer> movements = await _unitOfWork.accountRepository.GetMovements(accountId);
+            List<Transfer> movements = await _unitOfWork.accountRepository.GetAccountMovementsAsync(accountId);
 
             List<MovementResponse> movementDTO = new List<MovementResponse>();
 
