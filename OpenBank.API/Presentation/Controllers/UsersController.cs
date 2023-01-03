@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Application.DTO;
-using OpenBank.API.BusinessRules.Interfaces;
+using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Domain.Models.Entities;
+using AutoMapper;
 
 namespace OpenBank.API.Controllers;
 
@@ -11,11 +13,13 @@ public class UsersController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IUserBusinessRules _userBusinessRules;
+    private readonly IMapper _mapper;
 
-    public UsersController(IUnitOfWork unitOfWork, IUserBusinessRules userBusinessRules)
+    public UsersController(IUnitOfWork unitOfWork, IUserBusinessRules userBusinessRules, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _userBusinessRules = userBusinessRules;
+        _mapper = mapper;
     }
 
     // call to verify the connection with the db
@@ -44,8 +48,19 @@ public class UsersController : ControllerBase
 
         try
         {
-            CreateUserResponse result = await _userBusinessRules.CreateUserAsync(createUser);
-            return Ok(result);
+            User newUser = new User()
+            {
+                Email = createUser.Email,
+                FullName = createUser.FullName,
+                Password = createUser.Password,
+                UserName = createUser.Username,
+                Created_at = DateTime.UtcNow
+            };
+
+            User result = await _userBusinessRules.CreateUserAsync(newUser);            
+            CreateUserResponse userDTO = _mapper.Map<User, CreateUserResponse>(result);
+            
+            return Ok(userDTO);
         }
         catch (Exception e)
         {

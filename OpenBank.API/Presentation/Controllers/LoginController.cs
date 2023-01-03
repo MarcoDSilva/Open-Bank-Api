@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Application.DTO;
-using OpenBank.API.BusinessRules.Interfaces;
+using OpenBank.API.Domain.Business.Interfaces;
 
 namespace OpenBank.API.Controllers;
 
@@ -33,7 +33,7 @@ public class LoginController : ControllerBase
 
         try
         {
-            int userId = await _userBusinessRules.GetUserIdAsync(loginRequest);
+            int userId = await _userBusinessRules.GetUserIdAsync(loginRequest.UserName, loginRequest.Password);
 
             if (userId > 0)
             {

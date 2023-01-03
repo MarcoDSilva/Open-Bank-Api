@@ -25,7 +25,7 @@ namespace OpenBank.API.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("OpenBank.API.Domain.Entities.Account", b =>
+            modelBuilder.Entity("OpenBank.API.Domain.Models.Entities.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -52,7 +52,7 @@ namespace OpenBank.API.Migrations
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("OpenBank.API.Domain.Entities.Transfer", b =>
+            modelBuilder.Entity("OpenBank.API.Domain.Models.Entities.Transfer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -80,7 +80,7 @@ namespace OpenBank.API.Migrations
                     b.ToTable("Transfers");
                 });
 
-            modelBuilder.Entity("OpenBank.API.Domain.Entities.User", b =>
+            modelBuilder.Entity("OpenBank.API.Domain.Models.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -116,9 +116,9 @@ namespace OpenBank.API.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("OpenBank.API.Domain.Entities.Transfer", b =>
+            modelBuilder.Entity("OpenBank.API.Domain.Models.Entities.Transfer", b =>
                 {
-                    b.HasOne("OpenBank.API.Domain.Entities.Account", "Account")
+                    b.HasOne("OpenBank.API.Domain.Models.Entities.Account", "Account")
                         .WithMany()
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -1,11 +1,11 @@
 using OpenBank.API.Application.DTO;
-using OpenBank.API.Domain.Entities;
+using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.API.Application.Interfaces;
 
 public interface IAccountRepository
 {
-    Task<int> AddAsync(Account account);
+    Task<(int, Account)> AddAsync(Account account);
     void Update(Account account);
 
     Task<Account?> GetByIdAsync(int accountId);

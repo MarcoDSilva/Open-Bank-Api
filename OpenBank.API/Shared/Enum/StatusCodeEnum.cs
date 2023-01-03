@@ -1,4 +1,4 @@
-namespace OpenBank.API.Application.Enum;
+namespace OpenBank.API.Enum;
 
 public enum StatusCode : ushort
 {

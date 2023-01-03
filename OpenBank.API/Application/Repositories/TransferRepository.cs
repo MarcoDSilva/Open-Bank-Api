@@ -1,5 +1,5 @@
 using OpenBank.Api.Data;
-using OpenBank.API.Domain.Entities;
+using OpenBank.API.Domain.Models.Entities;
 using OpenBank.API.Application.Interfaces;
 
 namespace OpenBank.API.Application.Repositories;

@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Application.DTO;
 using Microsoft.AspNetCore.Authorization;
-using OpenBank.API.BusinessRules.Interfaces;
+using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Domain.Models.Entities;
+using AutoMapper;
 
 namespace OpenBank.API.Controllers;
 
@@ -12,12 +14,16 @@ namespace OpenBank.API.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IAccountBusinessRules _accountBusinessRules;
+    private readonly IAccountBusinessRules _accountBusiness;
+    private readonly ITransferBusinessRules _transferBusiness;
+    private readonly IMapper _mapper;
 
-    public AccountsController(IUnitOfWork unitOfWork, IAccountBusinessRules accountBusinessRules)
+    public AccountsController(IUnitOfWork unitOfWork, IAccountBusinessRules accountBusinessRules, ITransferBusinessRules transferBusinessRules, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
-        _accountBusinessRules = accountBusinessRules;
+        _accountBusiness = accountBusinessRules;
+        _transferBusiness = transferBusinessRules;
+        _mapper = mapper;
     }
 
     [HttpPost]
@@ -36,9 +42,22 @@ public class AccountsController : ControllerBase
 
         try
         {
-            var result = await _accountBusinessRules.CreateAccount(userId, accountRequest);
+            Account account = new Account()
+            {
+                Balance = accountRequest.Amount,
+                Created_at = DateTime.UtcNow,
+                Currency = accountRequest.Currency,
+                UserId = userId
+            };
 
-            return !result.Item1 ? Problem() : Ok(result.Item2);
+            (bool, Account) result = await _accountBusiness.CreateAccount(userId, account);
+
+            if (!result.Item1)
+                return Problem();
+
+            var response = _mapper.Map<Account, AccountResponse>(result.Item2);
+
+            return Ok(response);
         }
         catch (Exception e)
         {
@@ -65,12 +84,16 @@ public class AccountsController : ControllerBase
 
         try
         {
-            List<AccountResponse> result = await _accountBusinessRules.GetAccounts(userId);
+            List<Account> accounts = await _accountBusiness.GetAccounts(userId);
 
-            if (result == null || result.Count == 0)
+            if (accounts == null || accounts.Count == 0)
                 return NotFound("This user has no accounts.");
 
-            return Ok(result);
+            List<AccountResponse> accountResponseDTO = new List<AccountResponse>();
+
+            accounts.ForEach(acc => accountResponseDTO.Add(_mapper.Map<Account, AccountResponse>(acc)));
+
+            return Ok(accountResponseDTO);
         }
         catch (Exception e)
         {
@@ -104,16 +127,20 @@ public class AccountsController : ControllerBase
 
         try
         {
-            AccountResponse? account = await _accountBusinessRules.GetAccountById(id, userId);
+            Account? account = await _accountBusiness.GetAccountById(id, userId);
 
             if (account is null)
                 return NotFound("There is no account with this ID");
 
-            List<MovementResponse> movements = await _accountBusinessRules.GetAccountMovements(account.Id);            
+            List<Transfer> movements = await _transferBusiness.GetAccountMovementsAsync(account.Id);
+
+            List<MovementResponse> movementsDTO = new List<MovementResponse>();
+            movements.ForEach(mov => movementsDTO.Add(_mapper.Map<Transfer, MovementResponse>(mov)));
+
             AccountMovement accountWithMovements = new AccountMovement()
             {
-                Account = account,
-                Movements = movements
+                Account = _mapper.Map<Account, AccountResponse>(account),
+                Movements = movementsDTO
             };
 
             return Ok(accountWithMovements);

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using OpenBank.Api.Data;
-using OpenBank.API.Domain.Entities;
+using OpenBank.API.Domain.Models.Entities;
 using OpenBank.API.Application.Interfaces;
 
 namespace OpenBank.API.Application.Repositories;
@@ -14,11 +14,16 @@ public class AccountRepository : IAccountRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    public async Task<int> AddAsync(Account account)
+
+    /// <summary>
+    /// Inserts a new account
+    /// </summary>
+    /// <returns>Insertion ID && account entity</returns>
+    public async Task<(int, Account)> AddAsync(Account account)
     {
         var inserted = await _openBankApiDbContext.Accounts.AddAsync(account);
         var save = await _openBankApiDbContext.SaveChangesAsync();
-        return save;
+        return (save, inserted.Entity);
     }
 
 
@@ -52,8 +57,8 @@ public class AccountRepository : IAccountRepository
     public async Task<List<Account>> GetAccountsAsync(int userId)
     {
         List<Account> existantAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
-        List<Account> userAccounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList(); 
-            
+        List<Account> userAccounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList();
+
         return userAccounts;
     }
 
@@ -65,13 +70,13 @@ public class AccountRepository : IAccountRepository
     public async Task<List<Transfer>> GetAccountMovementsAsync(int accountId)
     {
         var existantMovements = await _openBankApiDbContext.Transfers.ToListAsync();
-        List<Transfer> movements = existantMovements.FindAll(mov => mov.AccountId == accountId).ToList();      
+        List<Transfer> movements = existantMovements.FindAll(mov => mov.AccountId == accountId).ToList();
 
         return movements;
     }
 
     public async Task<bool> IsUserAccountAsync(int accountId, int userId)
-    {        
+    {
         List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
         Account? account = accountList.Find(acc => acc.Id == accountId);
 
@@ -81,5 +86,5 @@ public class AccountRepository : IAccountRepository
     public void Update(Account account)
     {
         _openBankApiDbContext.Accounts.Update(account);
-    }  
+    }
 }

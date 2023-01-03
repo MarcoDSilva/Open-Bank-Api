@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
-using OpenBank.API.BusinessRules.Interfaces;
+using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.API.Controllers;
 
@@ -13,12 +14,14 @@ public class TransfersController : ControllerBase
 {
 
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ITransferBusinessRules _transferBusinessRules;
+    private readonly ITransferBusinessRules _transferBusiness;
+    private readonly IAccountBusinessRules _accountBusiness;
 
-    public TransfersController(IUnitOfWork unitOfWork, ITransferBusinessRules transferBusinessRules)
+    public TransfersController(IUnitOfWork unitOfWork, ITransferBusinessRules transferBusiness, IAccountBusinessRules accountBusiness)
     {
         _unitOfWork = unitOfWork;
-        _transferBusinessRules = transferBusinessRules;
+        _transferBusiness = transferBusiness;
+        _accountBusiness = accountBusiness;
     }
 
     [HttpPost]
@@ -36,17 +39,24 @@ public class TransfersController : ControllerBase
 
         try
         {
-            var result = await _transferBusinessRules.TransferRequestAsync(transferRequest, userId);
+            Movement movement = new Movement()
+            {
+                accountFrom = transferRequest.From_account,
+                accountTo = transferRequest.To_account,
+                Amount = transferRequest.Amount
+            };
+
+            var result = await _transferBusiness.TransferRequestAsync(movement, userId);
 
             switch (result.Item1)
             {
-                case Application.Enum.StatusCode.Sucess:
+                case Enum.StatusCode.Sucess:
                     return Ok(result.Item2);
-                case Application.Enum.StatusCode.BadRequest:
+                case Enum.StatusCode.BadRequest:
                     return BadRequest(result.Item2);
-                case Application.Enum.StatusCode.NotFound:
+                case Enum.StatusCode.NotFound:
                     return NotFound(result.Item2);
-                case Application.Enum.StatusCode.Forbidden:
+                case Enum.StatusCode.Forbidden:
                     return Forbid(result.Item2);
                 default:
                     return Ok(result.Item2);

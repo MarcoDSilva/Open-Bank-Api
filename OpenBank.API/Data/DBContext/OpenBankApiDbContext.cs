@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using OpenBank.API.Domain.Entities;
+using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.Api.Data;
 

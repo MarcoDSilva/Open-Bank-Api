@@ -1,11 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
-using OpenBank.API.BusinessRules.Interfaces;
-using OpenBank.API.Domain.Entities;
+using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Domain.Models.Entities;
 
-namespace OpenBank.API.BusinessRules;
+namespace OpenBank.API.Domain.Business.Logic;
 
 public class UserBusinessRules : IUserBusinessRules
 {
@@ -18,25 +17,17 @@ public class UserBusinessRules : IUserBusinessRules
         _mapper = mapper;
     }
 
-    public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest createUserRequest)
+    public async Task<User> CreateUserAsync(User createUserRequest)
     {
         try
         {
             PasswordHasher<string> pwHasher = new PasswordHasher<string>();
 
-            User user = new User()
-            {
-                Email = createUserRequest.Email,
-                FullName = createUserRequest.FullName,
-                Password = pwHasher.HashPassword(createUserRequest.Username, createUserRequest.Password),
-                UserName = createUserRequest.Username,
-                Created_at = DateTime.UtcNow
-            };
+            createUserRequest.Password = pwHasher.HashPassword(createUserRequest.UserName, createUserRequest.Password);
 
-            User created = await _unitOfwork.userRepository.CreateUserAsync(user);
-            CreateUserResponse userDTO = _mapper.Map<User, CreateUserResponse>(created);
+            User createdUser = await _unitOfwork.userRepository.CreateUserAsync(createUserRequest);           
 
-            return userDTO;
+            return createdUser;
         }
         catch (Exception e)
         {
@@ -59,18 +50,18 @@ public class UserBusinessRules : IUserBusinessRules
         }
     }
 
-    public async Task<int> GetUserIdAsync(LoginUserRequest login)
+    public async Task<int> GetUserIdAsync(string username, string password)
     {
         try
         {
-            User? existentUser = await _unitOfwork.userRepository.GetUserAsync(login.UserName);
+            User? existentUser = await _unitOfwork.userRepository.GetUserAsync(username);
 
             if (string.IsNullOrWhiteSpace(existentUser?.UserName))
                 return 0;
 
             PasswordHasher<string> pwHasher = new PasswordHasher<string>();
             int validUser = (int)pwHasher.VerifyHashedPassword(
-                                    login.UserName, existentUser?.Password, login.Password
+                                    username, existentUser?.Password, password
                                 );
 
             return validUser > 0 ? existentUser.Id : 0;

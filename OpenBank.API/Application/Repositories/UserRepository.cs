@@ -1,6 +1,6 @@
 using OpenBank.API.Application.DTO;
 using OpenBank.Api.Data;
-using OpenBank.API.Domain.Entities;
+using OpenBank.API.Domain.Models.Entities;
 using OpenBank.API.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +20,6 @@ public class UserRepository : IUserRepository
         var inserted = await _openBankApiDbContext.Users.AddAsync(createUser);
         var save = await _openBankApiDbContext.SaveChangesAsync();
 
-        //return UserToCreationResponseDTO(inserted.Entity);
         return inserted.Entity;
     }
 

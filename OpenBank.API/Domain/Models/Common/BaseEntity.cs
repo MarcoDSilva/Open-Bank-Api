@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace OpenBank.API.Domain.Common;
+namespace OpenBank.API.Domain.Models.Common;
 
 public abstract class BaseEntity
 {

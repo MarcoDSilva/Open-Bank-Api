@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using OpenBank.API.Domain.Common;
+using OpenBank.API.Domain.Models.Common;
 
-namespace OpenBank.API.Domain.Entities;
+namespace OpenBank.API.Domain.Models.Entities;
 
 public class User : BaseEntity
 {
