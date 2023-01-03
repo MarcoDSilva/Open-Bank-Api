@@ -21,7 +21,7 @@ public class AccountsController : ControllerBase
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(IEnumerable<CreateAccountRequest>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AccountResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

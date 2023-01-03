@@ -5,7 +5,7 @@ namespace OpenBank.API.BusinessRules.Interfaces;
 
 public interface IAccountBusinessRules
 {
-    Task<(bool, CreateAccountRequest)> CreateAccount(int idUser, CreateAccountRequest createAccount);
+    Task<(bool, AccountResponse)> CreateAccount(int idUser, CreateAccountRequest createAccount);
     Task<AccountResponse?> GetAccountById(int accountId, int userId);
     Task<List<AccountResponse>> GetAccounts(int userId);
     Task<List<MovementResponse>> GetAccountMovements(int accountId);

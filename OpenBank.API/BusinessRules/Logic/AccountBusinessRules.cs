@@ -22,7 +22,7 @@ public class AccountBusinessRules : IAccountBusinessRules
     /// <exception>Exception in case something fails </exception>
     /// <returns>A Task with the request back if succeded the creation</returns>
     /// </summary>
-    public async Task<(bool, CreateAccountRequest)> CreateAccount(int idUser, CreateAccountRequest createAccount)
+    public async Task<(bool, AccountResponse)> CreateAccount(int idUser, CreateAccountRequest createAccount)
     {
         Account account = new Account()
         {
@@ -34,9 +34,15 @@ public class AccountBusinessRules : IAccountBusinessRules
 
         try
         {
-            var newAccountId = await _unitOfWork.accountRepository.AddAsync(account);
+            int newAccountId = await _unitOfWork.accountRepository.AddAsync(account);
 
-            return newAccountId <= 0 ? (false, createAccount) : (true, createAccount);
+            if (newAccountId <= 0)
+                return (false, new AccountResponse());
+
+            account.Id = newAccountId;
+            AccountResponse response = _mapper.Map<Account, AccountResponse>(account);
+
+            return (true, response);
         }
         catch (Exception e)
         {
