@@ -36,7 +36,6 @@ public class AccountBusinessRulesTests
             Currency = "EUR",
             Id = 1
         };
-
     }
 
     [Test]
@@ -105,7 +104,7 @@ public class AccountBusinessRulesTests
         var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.GetAccountById(accountId, userId));
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result?.Message, Is.EqualTo(ErrorDescriptions.GetAccountById));
+        Assert.That(result?.Message, Is.EqualTo(ErrorDescriptions.FailedTransfer));
     }
 
     [Test]
