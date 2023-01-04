@@ -1,6 +1,6 @@
 namespace OpenBank.Api.Shared;
 
-public class SharedDescriptions
+public class AccountDescriptions
 {
     public static readonly string Debit = "Debit";
     public static readonly string Credit = "Credit";

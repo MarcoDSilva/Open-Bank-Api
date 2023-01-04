@@ -1,13 +1,9 @@
 using AutoMapper;
-using Microsoft.OpenApi.Any;
 using Moq;
-using NUnit.Framework;
-using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
-using OpenBank.API.Application.Repositories;
-using OpenBank.API.BusinessRules;
-using OpenBank.API.BusinessRules.Interfaces;
-using OpenBank.API.Domain.Entities;
+using OpenBank.API.Domain.Business.Logic;
+using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.UnitTesting;
 
@@ -17,7 +13,7 @@ public class AccountBusinessRulesTests
     private IAccountBusinessRules _accountBusiness;
     private Mock<IUnitOfWork> _unitOfWork;
     private Mock<IMapper> _mapper;
-    private CreateAccountRequest _createAccount;
+    private Account _account;
 
     public AccountBusinessRulesTests()
     {
@@ -31,56 +27,106 @@ public class AccountBusinessRulesTests
     [SetUp]
     public void SetUp()
     {
-        _createAccount = new CreateAccountRequest()
+        _account = new Account()
         {
-            Amount = 100,
-            Currency = "EUR"
+            UserId = 1,
+            Created_at = DateTime.UtcNow,
+            Balance = 100,
+            Currency = "EUR",
+            Id = 1
         };
 
     }
 
     [Test]
-    [Ignore("not implemented")]
     public void GetAccounts_ReceivesUserID_ReturnsAccounts()
     {
+        int userId = 1;
+
+        _unitOfWork.Setup(acc => acc.accountRepository.GetAccountsAsync(userId)).ReturnsAsync(new List<Account>());
+
+        var result = _accountBusiness.GetAccounts(userId);
+        Assert.That(result, Is.Not.Null);
     }
 
     [Test]
-    [Ignore("not implemented")]
     public void GetAccounts_ServerFails_ThrowsException()
     {
+        int userId = 1;
 
+        _unitOfWork.Setup(acc => acc.accountRepository.GetAccountsAsync(userId)).Throws(new Exception());
+
+        var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.GetAccounts(userId));
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result?.Message, Is.EqualTo("Error while obtaining the account"));
     }
 
     [Test]
-    [Ignore("not implemented")]
     public void GetAccountById_ReceivesAccountId_ReturnsAccount()
     {
+        int userId = 1;
+        int accountId = 1;
 
+        _unitOfWork.Setup(acc => acc.accountRepository.IsUserAccountAsync(1, 1)).ReturnsAsync(true);
+        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(accountId, userId)).ReturnsAsync(_account);
+
+        var result = _accountBusiness.GetAccountById(accountId, userId);
+
+        Assert.That(result, Is.Not.Null);
+        Assert.AreEqual(result.Result?.Id, accountId);
+        Assert.AreEqual(result.Result?.UserId, userId);
+        Assert.AreEqual(result.Result?.Currency, _account.Currency);
     }
 
     [Test]
-    [Ignore("not implemented")]
-    public void GetAccountById_ReceivesNonExistantId_ReturnsNothing()
+    public void GetAccountById_ReceivesNonExistantId_ReturnsNull()
     {
+        int userId = 1;
+        int accountId = 1;
+        Account? accountIsNull = null;
 
+        _unitOfWork.Setup(acc => acc.accountRepository.IsUserAccountAsync(1, 1)).ReturnsAsync(true);
+        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(accountId, userId)).ReturnsAsync(accountIsNull);
+
+        var result = _accountBusiness.GetAccountById(accountId, userId);
+
+        Assert.That(result.Result, Is.Null);
+    }
+
+    public void GetAccountById_ServerFails_ThrowsException()
+    {
+        int userId = 1;
+        int accountId = 1;
+
+        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(accountId, userId)).Throws(new Exception());
+
+        var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.GetAccountById(accountId, userId));
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result?.Message, Is.EqualTo("Error while obtaining this account"));
     }
 
     [Test]
     public async Task CreateAccount_GetsParametersToCreateAcc_ReturnsCreatedAccount()
     {
-        _unitOfWork.Setup(creation => creation.accountRepository.AddAsync(It.IsAny<Account>())).ReturnsAsync(1);
+        int userId = 1;
+        _unitOfWork.Setup(repo => repo.accountRepository.AddAsync(It.IsAny<Account>())).ReturnsAsync((userId, new Account()));
 
-        var result = await _accountBusiness.CreateAccount(1, _createAccount);
+        var result = await _accountBusiness.CreateAccount(userId, _account);
+
         Assert.That(result.Item1, Is.True);
     }
 
     [Test]
-    public async Task CreateAccount_ServerFails_ThrowsException()
+    public void CreateAccount_ServerFails_ThrowsException()
     {
-        _unitOfWork.Setup(creation => creation.accountRepository.AddAsync(It.IsAny<Account>())).ThrowsAsync(new ArgumentException());
-        var result = await _accountBusiness.CreateAccount(1, _createAccount);
+        int userId = 1;
+        _unitOfWork.Setup(repo => repo.accountRepository.AddAsync(It.IsAny<Account>())).Throws(new Exception());
 
-        Assert.ThrowsAsync<ArgumentException>(async () => await _accountBusiness.CreateAccount(4, _createAccount));
+        var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.CreateAccount(userId, _account));
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result?.Message, Is.EqualTo("Error while creating the user"));
     }
 }

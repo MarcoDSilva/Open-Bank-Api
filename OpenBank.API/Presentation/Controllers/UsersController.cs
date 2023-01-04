@@ -22,7 +22,6 @@ public class UsersController : ControllerBase
         _mapper = mapper;
     }
 
-    // call to verify the connection with the db
     [HttpGet]
     public IActionResult Users()
     {
@@ -57,9 +56,9 @@ public class UsersController : ControllerBase
                 Created_at = DateTime.UtcNow
             };
 
-            User result = await _userBusinessRules.CreateUserAsync(newUser);            
+            User result = await _userBusinessRules.CreateUserAsync(newUser);
             CreateUserResponse userDTO = _mapper.Map<User, CreateUserResponse>(result);
-            
+
             return Ok(userDTO);
         }
         catch (Exception e)

@@ -37,7 +37,7 @@ public class TransferBusinessRules : ITransferBusinessRules
             Account = accountFrom,
             Amount = movement.Amount,
             Created_at = DateTime.UtcNow,
-            OperationType = SharedDescriptions.Debit
+            OperationType = AccountDescriptions.Debit
         };
 
         Transfer accountToMovement = new Transfer()
@@ -45,7 +45,7 @@ public class TransferBusinessRules : ITransferBusinessRules
             Account = accountTo,
             Amount = movement.Amount,
             Created_at = DateTime.UtcNow,
-            OperationType = SharedDescriptions.Credit
+            OperationType = AccountDescriptions.Credit
         };
 
         try
@@ -85,19 +85,19 @@ public class TransferBusinessRules : ITransferBusinessRules
     private (StatusCode, string) ValidateAccountsForTransfer(Account? fromAcc, Account? toAcc, Movement transfer, int userId)
     {
         if (fromAcc is null)
-            return (StatusCode.NotFound, SharedDescriptions.AccountNotFound);
+            return (StatusCode.NotFound, AccountDescriptions.AccountNotFound);
 
         if (toAcc is null)
-            return (StatusCode.NotFound, SharedDescriptions.AccountNotFound);
+            return (StatusCode.NotFound, AccountDescriptions.AccountNotFound);
 
         if (fromAcc.UserId != userId)
-            return (StatusCode.Forbidden, SharedDescriptions.BearerNotAllowed);
+            return (StatusCode.Forbidden, AccountDescriptions.BearerNotAllowed);
 
         if (fromAcc.Balance < transfer.Amount)
-            return (StatusCode.BadRequest, SharedDescriptions.LowerBalance);
+            return (StatusCode.BadRequest, AccountDescriptions.LowerBalance);
 
         if (fromAcc.Currency != toAcc.Currency)
-            return (StatusCode.BadRequest, SharedDescriptions.LowerBalance);
+            return (StatusCode.BadRequest, AccountDescriptions.LowerBalance);
 
         return (StatusCode.Sucess, "");
     }

@@ -1,4 +1,5 @@
 using AutoMapper;
+using OpenBank.Api.Shared;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Domain.Business.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
@@ -35,7 +36,7 @@ public class AccountBusinessRules : IAccountBusinessRules
         catch (Exception e)
         {
             Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new Exception("Error while creating the user");
+            throw new Exception(ErrorDescriptions.CreateAccount);
         }
     }
 
@@ -58,7 +59,7 @@ public class AccountBusinessRules : IAccountBusinessRules
         catch (Exception e)
         {
             Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new Exception(e.Message);
+            throw new Exception(ErrorDescriptions.GetAccountById);
         }
     }
 
@@ -77,7 +78,7 @@ public class AccountBusinessRules : IAccountBusinessRules
         catch (Exception e)
         {
             Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new Exception(e.Message);
+            throw new Exception(ErrorDescriptions.GetAccounts);
         }
     }
 }
