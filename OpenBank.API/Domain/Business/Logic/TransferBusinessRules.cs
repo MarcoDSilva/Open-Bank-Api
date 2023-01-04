@@ -60,11 +60,11 @@ public class TransferBusinessRules : ITransferBusinessRules
             if (isSaved)
                 return (StatusCode.Sucess, "Transfer was completed with success");
 
-            return (StatusCode.ServerError, "Operation could not be concluded");
+            return (StatusCode.ServerError, ErrorDescriptions.FailedTransfer);
         }
         catch (Exception e)
         {
-            return (StatusCode.ServerError, e.Message);
+            throw new Exception(ErrorDescriptions.FailedTransfer);
         }
     }
 
@@ -97,7 +97,7 @@ public class TransferBusinessRules : ITransferBusinessRules
             return (StatusCode.BadRequest, AccountDescriptions.LowerBalance);
 
         if (fromAcc.Currency != toAcc.Currency)
-            return (StatusCode.BadRequest, AccountDescriptions.LowerBalance);
+            return (StatusCode.BadRequest, AccountDescriptions.DifferentCurrencies);
 
         return (StatusCode.Sucess, "");
     }
