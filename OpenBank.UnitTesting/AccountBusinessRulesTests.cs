@@ -4,6 +4,7 @@ using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Domain.Business.Logic;
 using OpenBank.API.Domain.Business.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
+using OpenBank.Api.Shared;
 
 namespace OpenBank.UnitTesting;
 
@@ -59,11 +60,11 @@ public class AccountBusinessRulesTests
         var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.GetAccounts(userId));
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result?.Message, Is.EqualTo("Error while obtaining the account"));
+        Assert.That(result?.Message, Is.EqualTo(ErrorDescriptions.GetAccounts));
     }
 
     [Test]
-    public void GetAccountById_ReceivesAccountId_ReturnsAccount()
+    public async Task GetAccountById_ReceivesAccountId_ReturnsAccount()
     {
         int userId = 1;
         int accountId = 1;
@@ -71,16 +72,16 @@ public class AccountBusinessRulesTests
         _unitOfWork.Setup(acc => acc.accountRepository.IsUserAccountAsync(1, 1)).ReturnsAsync(true);
         _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(accountId, userId)).ReturnsAsync(_account);
 
-        var result = _accountBusiness.GetAccountById(accountId, userId);
+        var result = await _accountBusiness.GetAccountById(accountId, userId);
 
         Assert.That(result, Is.Not.Null);
-        Assert.AreEqual(result.Result?.Id, accountId);
-        Assert.AreEqual(result.Result?.UserId, userId);
-        Assert.AreEqual(result.Result?.Currency, _account.Currency);
+        Assert.AreEqual(result?.Id, accountId);
+        Assert.AreEqual(result?.UserId, userId);
+        Assert.AreEqual(result?.Currency, _account.Currency);
     }
 
     [Test]
-    public void GetAccountById_ReceivesNonExistantId_ReturnsNull()
+    public async Task GetAccountById_ReceivesNonExistantId_ReturnsNull()
     {
         int userId = 1;
         int accountId = 1;
@@ -89,9 +90,9 @@ public class AccountBusinessRulesTests
         _unitOfWork.Setup(acc => acc.accountRepository.IsUserAccountAsync(1, 1)).ReturnsAsync(true);
         _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(accountId, userId)).ReturnsAsync(accountIsNull);
 
-        var result = _accountBusiness.GetAccountById(accountId, userId);
+        var result = await _accountBusiness.GetAccountById(accountId, userId);
 
-        Assert.That(result.Result, Is.Null);
+        Assert.That(result, Is.Null);
     }
 
     public void GetAccountById_ServerFails_ThrowsException()
@@ -104,7 +105,7 @@ public class AccountBusinessRulesTests
         var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.GetAccountById(accountId, userId));
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result?.Message, Is.EqualTo("Error while obtaining this account"));
+        Assert.That(result?.Message, Is.EqualTo(ErrorDescriptions.GetAccountById));
     }
 
     [Test]
@@ -127,6 +128,6 @@ public class AccountBusinessRulesTests
         var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.CreateAccount(userId, _account));
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result?.Message, Is.EqualTo("Error while creating the user"));
+        Assert.That(result?.Message, Is.EqualTo(ErrorDescriptions.CreateAccount));
     }
 }
