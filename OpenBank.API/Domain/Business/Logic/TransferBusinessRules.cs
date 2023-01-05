@@ -60,11 +60,11 @@ public class TransferBusinessRules : ITransferBusinessRules
             if (isSaved)
                 return (StatusCode.Sucess, "Transfer was completed with success");
 
-            return (StatusCode.ServerError, ErrorDescriptions.FailedTransfer);
+            return (StatusCode.ServerError, WarningDescriptions.FailedTransfer);
         }
         catch (Exception e)
         {
-            throw new Exception(ErrorDescriptions.FailedTransfer);
+            throw new Exception(WarningDescriptions.FailedTransfer);
         }
     }
 

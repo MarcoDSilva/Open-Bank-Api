@@ -7,6 +7,8 @@ public class UnitOfWork : IUnitOfWork
     public IUserRepository userRepository { get; }
     public IAccountRepository accountRepository { get; }
     public ITransferRepository transferRepository { get; }
+    public IDocumentRepository documentRepository { get; }
+
     public ITokenHandler tokenHandler { get; }
     public ILogger<Object> loggerHandler { get; }
 
@@ -14,6 +16,7 @@ public class UnitOfWork : IUnitOfWork
         IUserRepository userRepository,
         IAccountRepository accountRepository,
         ITransferRepository transferRepository,
+        IDocumentRepository documentRepository,
         ITokenHandler tokenHandler,
         ILogger<Object> loggerHandler
         )
@@ -23,5 +26,6 @@ public class UnitOfWork : IUnitOfWork
         this.transferRepository = transferRepository;
         this.tokenHandler = tokenHandler;
         this.loggerHandler = loggerHandler;
+        this.documentRepository = documentRepository;
     }
 }

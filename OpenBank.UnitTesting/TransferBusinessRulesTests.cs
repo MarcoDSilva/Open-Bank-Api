@@ -109,6 +109,6 @@ public class TransferBusinessRulesTests
         var result = Assert.ThrowsAsync<Exception>(async () => await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId));
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result?.Message, Is.EqualTo(ErrorDescriptions.FailedTransfer));
+        Assert.That(result?.Message, Is.EqualTo(WarningDescriptions.FailedTransfer));
     }
 }

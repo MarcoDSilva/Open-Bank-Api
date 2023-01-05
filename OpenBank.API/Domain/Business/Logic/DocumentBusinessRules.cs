@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Domain.Business.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
@@ -13,18 +14,21 @@ public class DocumentBusinessRules : IDocumentBusinessRules
         _unitOfWork = unitOfWork;
     }
 
-    public Task<Document> GetDocument(int accountId, int userId)
+    public async Task<Document?> GetDocumentAsync(int accountId)
     {
-        throw new NotImplementedException();
+        Document? document = await _unitOfWork.documentRepository.GetDocumentAsync(accountId);
+        return document;
     }
 
-    public Task<List<Document>> GetDocumentsAsync(int accountId, int userId)
+    public async Task<List<Document>> GetDocumentsAsync(int accountId)
     {
-        throw new NotImplementedException();
+        List<Document> documents = await _unitOfWork.documentRepository.GetDocumentsAsync(accountId);
+        return documents;
     }
 
-    public Task<bool> SubmitDocumentAsync()
+    public async Task<Document?> AddAsync(Document doc)
     {
-        throw new NotImplementedException();
+        Document? document = await _unitOfWork.documentRepository.AddAsync(doc);
+        return document;
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.OpenApi.Models;
 using OpenBank.API.Domain.Business.Interfaces;
 using OpenBank.API.Domain.Business.Logic;
 using OpenBank.API.Application;
+using OpenBank.API.Domain.Models.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,12 +52,14 @@ builder.Services.AddDbContext<OpenBankApiDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 builder.Services.AddScoped<IUserBusinessRules, UserBusinessRules>();
 builder.Services.AddScoped<IAccountBusinessRules, AccountBusinessRules>();
 builder.Services.AddScoped<ITransferBusinessRules, TransferBusinessRules>();
+builder.Services.AddScoped<IDocumentBusinessRules, DocumentBusinessRules>();
 
 builder.Services.AddScoped<ITokenHandler, OpenBank.API.Application.Repositories.TokenHandler>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

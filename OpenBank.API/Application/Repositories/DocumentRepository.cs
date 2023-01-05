@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using OpenBank.Api.Data;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
@@ -13,18 +14,28 @@ public class DocumentRepository : IDocumentRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    public Task<Document> AddAsync(Document document)
+    public async Task<Document?> AddAsync(Document document)
     {
-        throw new NotImplementedException();
+        Document? failedDocument = null;
+        var createdDocument = await _openBankApiDbContext.Documents.AddAsync(document);
+        var saved = await _openBankApiDbContext.SaveChangesAsync();
+
+        return saved > 0 ? createdDocument.Entity : failedDocument;
     }
 
-    public Task<Document> GetDocumentAsync(int accountId)
+    public async Task<Document?> GetDocumentAsync(int documentId)
     {
-        throw new NotImplementedException();
+        List<Document> documents = await _openBankApiDbContext.Documents.ToListAsync();
+        Document? document = documents.Find((doc) => doc.Id == documentId);
+
+        return document;
     }
 
-    public Task<List<Document>> GetDocumentsAsync(int accountId)
+    public async Task<List<Document>> GetDocumentsAsync(int accountId)
     {
-        throw new NotImplementedException();
+        List<Document> documents = await _openBankApiDbContext.Documents.ToListAsync();
+        List<Document> userDocuments = documents.FindAll(doc => doc.AccountId == accountId);
+
+        return userDocuments;
     }
 }

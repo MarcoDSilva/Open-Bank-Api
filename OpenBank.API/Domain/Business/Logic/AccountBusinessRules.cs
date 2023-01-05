@@ -36,7 +36,7 @@ public class AccountBusinessRules : IAccountBusinessRules
         catch (Exception e)
         {
             Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new Exception(ErrorDescriptions.CreateAccount);
+            throw new Exception(WarningDescriptions.CreateAccount);
         }
     }
 
@@ -59,7 +59,7 @@ public class AccountBusinessRules : IAccountBusinessRules
         catch (Exception e)
         {
             Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new Exception(ErrorDescriptions.GetAccountById);
+            throw new Exception(WarningDescriptions.GetAccountById);
         }
     }
 
@@ -78,7 +78,7 @@ public class AccountBusinessRules : IAccountBusinessRules
         catch (Exception e)
         {
             Console.WriteLine("Error: {0}", e.Message); //Log erro
-            throw new Exception(ErrorDescriptions.GetAccounts);
+            throw new Exception(WarningDescriptions.GetAccounts);
         }
     }
 }

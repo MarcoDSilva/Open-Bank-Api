@@ -4,7 +4,7 @@ namespace OpenBank.API.Application.Interfaces;
 
 public interface IDocumentRepository
 {
-    Task<Document> AddAsync(Document document);
+    Task<Document?> AddAsync(Document document);
     Task<List<Document>> GetDocumentsAsync(int accountId);
-    Task<Document> GetDocumentAsync(int accountId);
+    Task<Document?> GetDocumentAsync(int documentId);
 }

@@ -59,7 +59,7 @@ public class AccountBusinessRulesTests
         var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.GetAccounts(userId));
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result?.Message, Is.EqualTo(ErrorDescriptions.GetAccounts));
+        Assert.That(result?.Message, Is.EqualTo(WarningDescriptions.GetAccounts));
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class AccountBusinessRulesTests
         var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.GetAccountById(accountId, userId));
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result?.Message, Is.EqualTo(ErrorDescriptions.FailedTransfer));
+        Assert.That(result?.Message, Is.EqualTo(WarningDescriptions.FailedTransfer));
     }
 
     [Test]
@@ -127,6 +127,6 @@ public class AccountBusinessRulesTests
         var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.CreateAccount(userId, _account));
 
         Assert.That(result, Is.Not.Null);
-        Assert.That(result?.Message, Is.EqualTo(ErrorDescriptions.CreateAccount));
+        Assert.That(result?.Message, Is.EqualTo(WarningDescriptions.CreateAccount));
     }
 }

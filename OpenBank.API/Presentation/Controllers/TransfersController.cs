@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OpenBank.Api.Shared;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Domain.Business.Interfaces;
@@ -35,7 +36,7 @@ public class TransfersController : ControllerBase
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
 
         if (userId <= 0)
-            return Unauthorized("You must login first");
+            return Unauthorized(AccountDescriptions.NotLoggedIn);
 
         try
         {

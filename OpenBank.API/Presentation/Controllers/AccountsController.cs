@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using OpenBank.API.Domain.Business.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 using AutoMapper;
+using OpenBank.Api.Shared;
 
 namespace OpenBank.API.Controllers;
 
@@ -80,7 +81,7 @@ public class AccountsController : ControllerBase
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
 
         if (userId <= 0)
-            return Unauthorized("You must login first");
+            return Unauthorized(AccountDescriptions.NotLoggedIn);
 
         try
         {
@@ -119,19 +120,19 @@ public class AccountsController : ControllerBase
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
 
         if (userId <= 0)
-            return Unauthorized("You must login first");
+            return Unauthorized(AccountDescriptions.NotLoggedIn);
 
         // validar campos vazios
         if (id <= 0)
             return BadRequest("Account id must be higher than 0");
 
+        Account? account = await _accountBusiness.GetAccountById(id, userId);
+
+        if (account is null)
+            return NotFound(AccountDescriptions.AccountNonExistant);
+
         try
         {
-            Account? account = await _accountBusiness.GetAccountById(id, userId);
-
-            if (account is null)
-                return NotFound("There is no account with this ID");
-
             List<Transfer> movements = await _transferBusiness.GetAccountMovementsAsync(account.Id);
 
             List<MovementResponse> movementsDTO = new List<MovementResponse>();
