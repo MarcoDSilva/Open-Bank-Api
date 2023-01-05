@@ -68,7 +68,7 @@ public class AccountBusinessRulesTests
         int userId = 1;
         int accountId = 1;
 
-        _unitOfWork.Setup(acc => acc.accountRepository.IsUserAccountAsync(1, 1)).ReturnsAsync(true);
+        _unitOfWork.Setup(acc => acc.accountRepository.IsUserAccountAsync(accountId, userId)).ReturnsAsync(true);
         _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(accountId, userId)).ReturnsAsync(_account);
 
         var result = await _accountBusiness.GetAccountById(accountId, userId);
@@ -86,7 +86,7 @@ public class AccountBusinessRulesTests
         int accountId = 1;
         Account? accountIsNull = null;
 
-        _unitOfWork.Setup(acc => acc.accountRepository.IsUserAccountAsync(1, 1)).ReturnsAsync(true);
+        _unitOfWork.Setup(acc => acc.accountRepository.IsUserAccountAsync(accountId, userId)).ReturnsAsync(true);
         _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(accountId, userId)).ReturnsAsync(accountIsNull);
 
         var result = await _accountBusiness.GetAccountById(accountId, userId);

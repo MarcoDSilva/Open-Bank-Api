@@ -1,4 +1,3 @@
-using OpenBank.API.Application.DTO;
 using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.API.Application.Interfaces;
