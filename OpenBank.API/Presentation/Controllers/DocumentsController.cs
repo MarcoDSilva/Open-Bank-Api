@@ -12,17 +12,19 @@ namespace OpenBank.API.Controllers;
 public class DocumentsController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IDocumentBusinessRules _documentBusiness;
 
-    public DocumentsController(IUnitOfWork unitOfWork)
+    public DocumentsController(IUnitOfWork unitOfWork, IDocumentBusinessRules documentBusinessRules)
     {
         _unitOfWork = unitOfWork;
+        _documentBusiness = documentBusinessRules;
     }
 
-    [HttpPost("accounts/documents")]
+    [HttpPost("accounts/{accoundId}/documents")]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Documents(string document)
+    public async Task<IActionResult> SubmitDocument([FromRoute] int accountId)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
@@ -33,10 +35,10 @@ public class DocumentsController : Controller
         return NotFound();
     }
 
-    [HttpGet("accounts/documents")]
+    [HttpGet("accounts/{accountId}/documents")]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Documents()
+    public async Task<IActionResult> GetAccountDocuments([FromRoute] int accoundId)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
@@ -47,11 +49,11 @@ public class DocumentsController : Controller
         return NotFound();
     }
 
-    [HttpGet("accounts/documents/{docId}")]
+    [HttpGet("accounts/{accountId}/documents/{docId}")]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Documents(int docId)
+    public async Task<IActionResult> GetDocument([FromRoute] int accountId, [FromRoute] int docId)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);

@@ -113,7 +113,7 @@ public class AccountsController : ControllerBase
     /// <summary>
     /// Get the account and movements associated with the id
     /// </summary>
-    public async Task<IActionResult> Accounts(int id)
+    public async Task<IActionResult> Accounts([FromRoute] int id)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
