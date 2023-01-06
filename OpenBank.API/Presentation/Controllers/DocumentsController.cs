@@ -53,27 +53,36 @@ public class DocumentsController : Controller
 
         /* lines below are just some tests to confirm the logic working before putting this on a method */
         string rootDir = Directory.GetDirectoryRoot("OpenBank");
-        string folderPath = string.Concat(rootDir, "ApiUserFiles");
+        string folderPath = string.Concat(rootDir, "ApiUserFiles\\");
 
         if (!Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);
         }
 
-        string fileCreationUrl = string.Concat(folderPath, "/", file.FileName, file.ContentType);
+        string fileCreationUrl = string.Concat(folderPath, "testFile", ".json");
 
-
-        // if (!System.IO.File.Exists(fileCreationUrl))
-        // {
-        //     System.Console.WriteLine('create');
-        // }
-            
-
-
-        return new FileStreamResult(file.OpenReadStream(), file.ContentType)
+        try
         {
-            FileDownloadName = file.FileName
-        };
+            if (!System.IO.File.Exists(fileCreationUrl))
+            {
+                using (Stream fs = new FileStream(fileCreationUrl, FileMode.Create))
+                    await file.CopyToAsync(fs);
+            }
+        }
+        catch (System.Exception)
+        {
+            return Problem("fail");
+        }
+
+
+        return Ok(fileCreationUrl);
+
+
+        // return new FileStreamResult(file.OpenReadStream(), file.ContentType)
+        // {
+        //     FileDownloadName = file.FileName
+        // };
 
         // place it on a folder
         // write document obj and insert in db
