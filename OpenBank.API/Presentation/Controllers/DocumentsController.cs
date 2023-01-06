@@ -2,20 +2,16 @@ using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Domain.Business.Interfaces;
-using OpenBank.API.Application;
-using System.Reflection.Metadata.Ecma335;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using System.Net.Mime;
 using OpenBank.API.Domain.Models.Entities;
 using AutoMapper;
 using OpenBank.Api.Shared;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OpenBank.API.Controllers;
 
 [ApiController]
 [Route("api/")]
-
+[Authorize]
 public class DocumentsController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -31,13 +27,14 @@ public class DocumentsController : Controller
         _accountBusiness = accountRules;
     }
 
-    [HttpPost("accounts/{accoundId}/documents")]
+    [HttpPost("accounts/{accountId}/documents")]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SubmitDocument([FromRoute] int accountId)
+    public async Task<IActionResult> SubmitDocument([FromRoute] int accountId, IFormFile file)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
+
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
 
         if (userId <= 0)
@@ -51,20 +48,51 @@ public class DocumentsController : Controller
         if (account.UserId != userId)
             return Forbid(WarningDescriptions.ForbiddenAccess);
 
-        // get document bytes
-        // turn into a file 
+        if (file is null)
+            return BadRequest("File not uploaded");
+
+        /* lines below are just some tests to confirm the logic working before putting this on a method */
+        string rootDir = Directory.GetDirectoryRoot("OpenBank");
+        string folderPath = string.Concat(rootDir, "ApiUserFiles");
+
+        if (!Directory.Exists(folderPath))
+        {
+            Directory.CreateDirectory(folderPath);
+        }
+
+        string fileCreationUrl = string.Concat(folderPath, "/", file.FileName, file.ContentType);
+
+
+        // if (!System.IO.File.Exists(fileCreationUrl))
+        // {
+        //     System.Console.WriteLine('create');
+        // }
+            
+
+
+        return new FileStreamResult(file.OpenReadStream(), file.ContentType)
+        {
+            FileDownloadName = file.FileName
+        };
+
         // place it on a folder
         // write document obj and insert in db
         // problem() if any of the steps fail
 
         try
         {
-            Document? documentInserted = await _documentBusiness.AddAsync(new Document());
+            // Document? documentInserted = await _documentBusiness.AddAsync(new Document());
 
-            if (documentInserted is null)
-                return Problem();
+            // if (documentInserted is null)
+            //     return Problem();
 
             return Ok("Successfully added");
+        }
+        catch (ForbiddenAccountAccessException fe)
+        {
+            Console.WriteLine(AccountDescriptions.BearerNotAllowed);
+            return Problem(AccountDescriptions.BearerNotAllowed);
+
         }
         catch (Exception e)
         {

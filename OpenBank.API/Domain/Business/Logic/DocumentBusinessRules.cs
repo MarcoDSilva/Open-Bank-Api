@@ -1,4 +1,3 @@
-using System.Net.NetworkInformation;
 using OpenBank.API.Application.Interfaces;
 using OpenBank.API.Domain.Business.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
