@@ -6,6 +6,6 @@ public interface IDocumentBusinessRules
 {
     Task<Document?> AddAsync(Document document);
     Task<List<Document>> GetDocumentsAsync(int accountId);
-    Task<Document?> GetDocumentAsync(int accountId);
+    Task<Document?> GetDocumentAsync(int docId);
 
 }

@@ -6,6 +6,7 @@ using OpenBank.API.Domain.Models.Entities;
 using AutoMapper;
 using OpenBank.Api.Shared;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace OpenBank.API.Controllers;
 
@@ -95,7 +96,7 @@ public class DocumentsController : Controller
                 var saved = await _documentBusiness.AddAsync(documentToInsert);
 
                 if (saved?.Id > 0)
-                    return Ok(fileCreationUrl);
+                    return Ok(_mapper.Map<Document, DocumentResponse>(saved));
             }
 
             return Problem("Could not upload/create the file");
@@ -104,32 +105,6 @@ public class DocumentsController : Controller
         {
             return Problem("fail");
         }
-
-        // return new FileStreamResult(file.OpenReadStream(), file.ContentType)
-        // {
-        //     FileDownloadName = file.FileName
-        // };
-
-        // try
-        // {
-        //     // Document? documentInserted = await _documentBusiness.AddAsync(new Document());
-
-        //     // if (documentInserted is null)
-        //     //     return Problem();
-
-        //     return Ok("Successfully added");
-        // }
-        // catch (ForbiddenAccountAccessException fe)
-        // {
-        //     Console.WriteLine(AccountDescriptions.BearerNotAllowed);
-        //     return Problem(AccountDescriptions.BearerNotAllowed);
-
-        // }
-        // catch (Exception e)
-        // {
-        //     Console.WriteLine($"GetAccountDocuments error: {e.Message}");
-        //     return Problem(e.Message);
-        // }
     }
 
     [HttpGet("accounts/{accountId}/documents")]
@@ -193,13 +168,21 @@ public class DocumentsController : Controller
 
         try
         {
-            Document? document = await _documentBusiness.GetDocumentAsync(accountId);
+            Document? document = await _documentBusiness.GetDocumentAsync(docId);
 
             if (document is null)
                 return Ok("Document not found");
 
-            DocumentResponse documentDTO = _mapper.Map<Document, DocumentResponse>(document);
-            return Ok(documentDTO);
+            if (!System.IO.File.Exists(document.Url))
+                return Problem("Document not found");
+
+
+            return new FileStreamResult(System.IO.File.OpenRead(document.Url), document.ContentType)
+            {
+                FileDownloadName = document.FileName
+            };
+           
+            //return Ok(documentDTO);
         }
         catch (Exception e)
         {

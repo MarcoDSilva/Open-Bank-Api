@@ -8,7 +8,9 @@ public class DtoMapper : Profile
 {
     public DtoMapper()
     {
-        CreateMap<Document, DocumentRepository>();
+        CreateMap<Document, DocumentResponse>()
+            .ForMember(target => target.Name, options => options
+                .MapFrom(r => r.FileName));
         CreateMap<Account, AccountResponse>();
         CreateMap<Transfer, MovementResponse>().ReverseMap();
         CreateMap<User, CreateUserResponse>()

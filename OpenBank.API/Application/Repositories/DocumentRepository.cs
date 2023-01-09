@@ -26,7 +26,7 @@ public class DocumentRepository : IDocumentRepository
     public async Task<Document?> GetDocumentAsync(int documentId)
     {
         List<Document> documents = await _openBankApiDbContext.Documents.ToListAsync();
-        Document? document = documents.Find((doc) => doc.Id == documentId);
+        Document? document = documents.Find(doc => doc.Id == documentId);
 
         return document;
     }

@@ -13,9 +13,9 @@ public class DocumentBusinessRules : IDocumentBusinessRules
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Document?> GetDocumentAsync(int accountId)
+    public async Task<Document?> GetDocumentAsync(int docId)
     {
-        Document? document = await _unitOfWork.documentRepository.GetDocumentAsync(accountId);
+        Document? document = await _unitOfWork.documentRepository.GetDocumentAsync(docId);
         return document;
     }
 
