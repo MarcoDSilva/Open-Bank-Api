@@ -31,7 +31,7 @@ public class DocumentsController : Controller
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SubmitDocument([FromRoute] int accountId, IFormFile file)
+    public async Task<IActionResult> SubmitDocument([FromRoute] int accountId, IFormFile uploadedFile)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
 
@@ -48,66 +48,88 @@ public class DocumentsController : Controller
         if (account.UserId != userId)
             return Forbid(WarningDescriptions.ForbiddenAccess);
 
-        if (file is null)
+        if (uploadedFile is null)
             return BadRequest("File not uploaded");
 
-        /* lines below are just some tests to confirm the logic working before putting this on a method */
+        string mime = MimeTypes.GetMimeType(uploadedFile.FileName);
+
+        if (!mime.Equals("application/pdf") && !mime.Equals("application/png"))
+            return BadRequest("Document can only be of .png or .pdf");
+
+        if (uploadedFile.Length > 2000000)
+            return BadRequest("File cannot be bigger than 2MB");
+
         string rootDir = Directory.GetDirectoryRoot("OpenBank");
-        string folderPath = string.Concat(rootDir, "ApiUserFiles\\");
+        string folderPath = string.Concat(rootDir, "ApiUserFiles\\", "Accounts\\", account.Id.ToString() + "\\", "Documents\\");
 
         if (!Directory.Exists(folderPath))
         {
             Directory.CreateDirectory(folderPath);
         }
 
-        string fileCreationUrl = string.Concat(folderPath, "testFile", ".json");
+        string fileCreationUrl = string.Concat(
+            folderPath,
+            Guid.NewGuid().ToString(),
+            mime == "application/pdf" ? ".pdf" : ".png");
 
         try
         {
             if (!System.IO.File.Exists(fileCreationUrl))
             {
                 using (Stream fs = new FileStream(fileCreationUrl, FileMode.Create))
-                    await file.CopyToAsync(fs);
+                    await uploadedFile.CopyToAsync(fs);
             }
+
+            if (System.IO.File.Exists(fileCreationUrl))
+            {
+                Document documentToInsert = new Document()
+                {
+                    AccountId = accountId,
+                    ContentType = uploadedFile.ContentType,
+                    Created_at = DateTime.UtcNow,
+                    FileName = uploadedFile.FileName,
+                    Url = fileCreationUrl,
+                    SizeMB = uploadedFile.Length / Math.Pow(1024, 2)
+                };
+
+                var saved = await _documentBusiness.AddAsync(documentToInsert);
+
+                if (saved?.Id > 0)
+                    return Ok(fileCreationUrl);
+            }
+
+            return Problem("Could not upload/create the file");
         }
         catch (System.Exception)
         {
             return Problem("fail");
         }
 
-
-        return Ok(fileCreationUrl);
-
-
         // return new FileStreamResult(file.OpenReadStream(), file.ContentType)
         // {
         //     FileDownloadName = file.FileName
         // };
 
-        // place it on a folder
-        // write document obj and insert in db
-        // problem() if any of the steps fail
+        // try
+        // {
+        //     // Document? documentInserted = await _documentBusiness.AddAsync(new Document());
 
-        try
-        {
-            // Document? documentInserted = await _documentBusiness.AddAsync(new Document());
+        //     // if (documentInserted is null)
+        //     //     return Problem();
 
-            // if (documentInserted is null)
-            //     return Problem();
+        //     return Ok("Successfully added");
+        // }
+        // catch (ForbiddenAccountAccessException fe)
+        // {
+        //     Console.WriteLine(AccountDescriptions.BearerNotAllowed);
+        //     return Problem(AccountDescriptions.BearerNotAllowed);
 
-            return Ok("Successfully added");
-        }
-        catch (ForbiddenAccountAccessException fe)
-        {
-            Console.WriteLine(AccountDescriptions.BearerNotAllowed);
-            return Problem(AccountDescriptions.BearerNotAllowed);
-
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"GetAccountDocuments error: {e.Message}");
-            return Problem(e.Message);
-        }
+        // }
+        // catch (Exception e)
+        // {
+        //     Console.WriteLine($"GetAccountDocuments error: {e.Message}");
+        //     return Problem(e.Message);
+        // }
     }
 
     [HttpGet("accounts/{accountId}/documents")]

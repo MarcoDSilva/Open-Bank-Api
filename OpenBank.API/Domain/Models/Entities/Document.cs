@@ -16,7 +16,7 @@ public class Document : BaseEntity
     public string ContentType { get; set; }
 
     [Required]
-    public int SizeMB { get; set; }
+    public double SizeMB { get; set; }
 
     [Required]
     [ForeignKey("Accounts")]
