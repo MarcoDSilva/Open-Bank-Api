@@ -16,10 +16,10 @@ public class DocumentsController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly IDocumentBusinessRules _documentBusiness;
-    private readonly IAccountBusinessRules _accountBusiness;
+    private readonly IDocumentService _documentBusiness;
+    private readonly IAccountService _accountBusiness;
 
-    public DocumentsController(IUnitOfWork unitOfWork, IDocumentBusinessRules documentBusinessRules, IMapper mapper, IAccountBusinessRules accountRules)
+    public DocumentsController(IUnitOfWork unitOfWork, IDocumentService documentBusinessRules, IMapper mapper, IAccountService accountRules)
     {
         _unitOfWork = unitOfWork;
         _documentBusiness = documentBusinessRules;

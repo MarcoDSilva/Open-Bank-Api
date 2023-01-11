@@ -6,10 +6,10 @@ public static class ServicesRegistration
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services
-            .AddScoped<IUserBusinessRules, UserBusinessRules>()
-            .AddScoped<IAccountBusinessRules, AccountBusinessRules>()
-            .AddScoped<ITransferBusinessRules, TransferBusinessRules>()
-            .AddScoped<IDocumentBusinessRules, DocumentBusinessRules>();
+            .AddScoped<IUserService, UserService>()
+            .AddScoped<IAccountService, AccountService>()
+            .AddScoped<ITransferService, TransferService>()
+            .AddScoped<IDocumentService, DocumentService>();
 
         return services;
     }

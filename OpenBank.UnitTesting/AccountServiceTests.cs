@@ -5,22 +5,25 @@ using OpenBank.API.Application.Services.Logic;
 using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 using OpenBank.Api.Shared;
+using OpenBank.API.Application.DTO;
 
 namespace OpenBank.UnitTesting;
 
 [TestFixture]
-public class AccountBusinessRulesTests
+public class AccountServiceTests
 {
-    private IAccountBusinessRules _accountBusiness;
+    private IAccountService _accountService;
     private Mock<IUnitOfWork> _unitOfWork;
     private Mock<IMapper> _mapper;
     private Account _account;
 
-    public AccountBusinessRulesTests()
+    private CreateAccountRequest _accountRequest;
+
+    public AccountServiceTests()
     {
         _unitOfWork = new Mock<IUnitOfWork>();
         _mapper = new Mock<IMapper>();
-        _accountBusiness = new AccountBusinessRules(_unitOfWork.Object, _mapper.Object);
+        _accountService = new AccountService(_unitOfWork.Object, _mapper.Object);
 
         SetUp();
     }
@@ -36,6 +39,12 @@ public class AccountBusinessRulesTests
             Currency = "EUR",
             Id = 1
         };
+
+        _accountRequest = new CreateAccountRequest()
+        {
+            Amount = 100,
+            Currency = "EUR",
+        };
     }
 
     [Test]
@@ -45,7 +54,7 @@ public class AccountBusinessRulesTests
 
         _unitOfWork.Setup(acc => acc.accountRepository.GetAccountsAsync(userId)).ReturnsAsync(new List<Account>());
 
-        var result = _accountBusiness.GetAccounts(userId);
+        var result = _accountService.GetAccounts(userId);
         Assert.That(result, Is.Not.Null);
     }
 
@@ -56,7 +65,7 @@ public class AccountBusinessRulesTests
 
         _unitOfWork.Setup(acc => acc.accountRepository.GetAccountsAsync(userId)).Throws(new Exception());
 
-        var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.GetAccounts(userId));
+        var result = Assert.ThrowsAsync<Exception>(async () => await _accountService.GetAccounts(userId));
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result?.Message, Is.EqualTo(WarningDescriptions.GetAccounts));
@@ -71,7 +80,7 @@ public class AccountBusinessRulesTests
         _unitOfWork.Setup(acc => acc.accountRepository.IsUserAccountAsync(accountId, userId)).ReturnsAsync(true);
         _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(accountId, userId)).ReturnsAsync(_account);
 
-        var result = await _accountBusiness.GetAccountById(accountId, userId);
+        var result = await _accountService.GetAccountById(accountId, userId);
 
         Assert.That(result, Is.Not.Null);
         Assert.AreEqual(result?.Id, accountId);
@@ -89,7 +98,7 @@ public class AccountBusinessRulesTests
         _unitOfWork.Setup(acc => acc.accountRepository.IsUserAccountAsync(accountId, userId)).ReturnsAsync(true);
         _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(accountId, userId)).ReturnsAsync(accountIsNull);
 
-        var result = await _accountBusiness.GetAccountById(accountId, userId);
+        var result = await _accountService.GetAccountById(accountId, userId);
 
         Assert.That(result, Is.Null);
     }
@@ -101,7 +110,7 @@ public class AccountBusinessRulesTests
 
         _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(accountId, userId)).Throws(new Exception());
 
-        var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.GetAccountById(accountId, userId));
+        var result = Assert.ThrowsAsync<Exception>(async () => await _accountService.GetAccountById(accountId, userId));
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result?.Message, Is.EqualTo(WarningDescriptions.FailedTransfer));
@@ -111,11 +120,14 @@ public class AccountBusinessRulesTests
     public async Task CreateAccount_GetsParametersToCreateAcc_ReturnsCreatedAccount()
     {
         int userId = 1;
-        _unitOfWork.Setup(repo => repo.accountRepository.AddAsync(It.IsAny<Account>())).ReturnsAsync((userId, new Account()));
+        _account.Id = 1;
+        _account.UserId = 1;
 
-        var result = await _accountBusiness.CreateAccount(userId, _account);
+        _unitOfWork.Setup(repo => repo.accountRepository.AddAsync(_account)).ReturnsAsync((userId, _account));
 
-        Assert.That(result.Item1, Is.True);
+        var result = await _accountService.CreateAccount(userId, _accountRequest);
+
+        Assert.That(result, Is.Not.Null);
     }
 
     [Test]
@@ -124,7 +136,7 @@ public class AccountBusinessRulesTests
         int userId = 1;
         _unitOfWork.Setup(repo => repo.accountRepository.AddAsync(It.IsAny<Account>())).Throws(new Exception());
 
-        var result = Assert.ThrowsAsync<Exception>(async () => await _accountBusiness.CreateAccount(userId, _account));
+        var result = Assert.ThrowsAsync<Exception>(async () => await _accountService.CreateAccount(userId, _accountRequest));
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result?.Message, Is.EqualTo(WarningDescriptions.CreateAccount));

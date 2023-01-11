@@ -2,7 +2,7 @@ using OpenBank.API.Application.DTO;
 using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.API.Application.Services.Interfaces;
-public interface IUserBusinessRules
+public interface IUserService
 {
     Task<CreateUserResponse> CreateUserAsync(CreateUserRequest createUserRequest);
     List<User> GetAllUsers(); 

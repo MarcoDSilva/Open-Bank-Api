@@ -4,11 +4,11 @@ using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.API.Application.Services.Logic;
 
-public class DocumentBusinessRules : IDocumentBusinessRules
+public class DocumentService : IDocumentService
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public DocumentBusinessRules(IUnitOfWork unitOfWork)
+    public DocumentService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }

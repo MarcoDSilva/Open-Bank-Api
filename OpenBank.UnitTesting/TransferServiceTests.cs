@@ -9,18 +9,18 @@ using OpenBank.API.Enum;
 namespace OpenBank.UnitTesting;
 
 [TestFixture]
-public class TransferBusinessRulesTests
+public class TransferServiceTests
 {
-    private ITransferBusinessRules _transferBusiness;
+    private ITransferService _transferBusiness;
     private Mock<IUnitOfWork> _unitOfWork;
     private Movement _movement;
     private Account _accountFrom;
     private Account _accountTo;
 
-    public TransferBusinessRulesTests()
+    public TransferServiceTests()
     {
         _unitOfWork = new Mock<IUnitOfWork>();
-        _transferBusiness = new TransferBusinessRules(_unitOfWork.Object);
+        _transferBusiness = new TransferService(_unitOfWork.Object);
 
         SetUp();
     }
@@ -62,48 +62,51 @@ public class TransferBusinessRulesTests
     {
         var result = await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId);
 
-        Assert.That(result.Item1, Is.EqualTo(StatusCode.Sucess));
-        Assert.That(result.Item2, Is.EqualTo("Transfer was completed with success"));
+        Assert.That(result, Is.EqualTo("Transfer was completed with success"));
     }
 
     [Test]
-    public async Task TransferRequest_UserIsNotTheOwner_ReturnsBadRequest()
+    public void TransferRequest_UserIsNotTheOwner_ThrowsForbiddenAccountAcessException()
     {
         int fakeUserId = 3;
-        
-        var result = await _transferBusiness.TransferRequestAsync(_movement, fakeUserId);
 
-        Assert.That(result.Item1, Is.EqualTo(StatusCode.Forbidden));
-        Assert.That(result.Item2, Is.EqualTo(AccountDescriptions.BearerNotAllowed));
+        var result = Assert.ThrowsAsync<ForbiddenAccountAccessException>(async () => await _transferBusiness.TransferRequestAsync(_movement, fakeUserId));
+
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result?.Message, Is.EqualTo(AccountDescriptions.BearerNotAllowed));
     }
 
 
     [Test]
-    public async Task TransferRequest_DifferentCurrenciesBetweenAccounts_ReturnsBadRequest()
+    public void TransferRequest_DifferentCurrenciesBetweenAccounts_ThrowsDifferentCurrenciesException()
     {
         _accountFrom.Currency = "USD";
         _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_accountFrom.Id)).ReturnsAsync(_accountFrom);
+        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_accountTo.Id)).ReturnsAsync(_accountTo);
 
-        var result = await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId);
+        var result = Assert.ThrowsAsync<DifferentCurrenciesException>(async () => await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId));
 
-        Assert.That(result.Item1, Is.EqualTo(StatusCode.BadRequest));
-        Assert.That(result.Item2, Is.EqualTo(AccountDescriptions.DifferentCurrencies));
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result?.Message, Is.EqualTo(AccountDescriptions.DifferentCurrencies));
     }
 
     [Test]
-    public async Task TransferRequest_AmountFromAccountIsLessThanTheRequested_ReturnsBadRequest()
+    public void TransferRequest_AmountFromAccountIsLessThanTheRequested_ReturnsBadRequest()
     {
         _movement.Amount = 11;
 
-        var result = await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId);
+        var result = Assert.ThrowsAsync<LowerBalanceException>(async () => await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId));
 
-        Assert.That(result.Item1, Is.EqualTo(StatusCode.BadRequest));
-        Assert.That(result.Item2, Is.EqualTo(AccountDescriptions.LowerBalance));
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result?.Message, Is.EqualTo(AccountDescriptions.LowerBalance));
     }
+
+
+
 
     [Test]
     public void TransferRequest_ServerFails_ThrowsException()
-    {
+    {    
         _unitOfWork.Setup(acc => acc.accountRepository.Update(_accountFrom)).Throws(new Exception());
 
         var result = Assert.ThrowsAsync<Exception>(async () => await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId));

@@ -12,10 +12,10 @@ namespace OpenBank.API.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IUserBusinessRules _userBusinessRules;
+    private readonly IUserService _userBusinessRules;
     private readonly IMapper _mapper;
 
-    public UsersController(IUnitOfWork unitOfWork, IUserBusinessRules userBusinessRules, IMapper mapper)
+    public UsersController(IUnitOfWork unitOfWork, IUserService userBusinessRules, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _userBusinessRules = userBusinessRules;

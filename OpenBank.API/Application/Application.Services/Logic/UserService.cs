@@ -7,12 +7,12 @@ using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.API.Application.Services.Logic;
 
-public class UserBusinessRules : IUserBusinessRules
+public class UserService : IUserService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UserBusinessRules(IUnitOfWork unitOfwork, IMapper mapper)
+    public UserService(IUnitOfWork unitOfwork, IMapper mapper)
     {
         _unitOfWork = unitOfwork;
         _mapper = mapper;

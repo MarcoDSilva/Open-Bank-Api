@@ -5,11 +5,11 @@ using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.API.Application.Services.Logic;
 
-public class TransferBusinessRules : ITransferBusinessRules
+public class TransferService : ITransferService
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public TransferBusinessRules(IUnitOfWork unitOfWork)
+    public TransferService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
@@ -20,7 +20,7 @@ public class TransferBusinessRules : ITransferBusinessRules
         Account? accountTo = await _unitOfWork.accountRepository.GetByIdAsync(movement.accountTo);
 
         if (accountFrom is null || accountTo is null) throw new MovementAccountNotFoundException(AccountDescriptions.AccountNotFound);
-        if (accountTo.UserId != userId) throw new ForbiddenAccountAccessException(AccountDescriptions.BearerNotAllowed);
+        if (accountFrom.UserId != userId) throw new ForbiddenAccountAccessException(AccountDescriptions.BearerNotAllowed);
         if (accountTo.Balance < movement.Amount) throw new LowerBalanceException(AccountDescriptions.LowerBalance);
         if (accountTo.Currency != accountFrom.Currency) throw new DifferentCurrenciesException(AccountDescriptions.DifferentCurrencies);
 

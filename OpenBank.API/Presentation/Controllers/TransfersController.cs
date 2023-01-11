@@ -15,10 +15,10 @@ public class TransfersController : ControllerBase
 {
 
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ITransferBusinessRules _transferBusiness;
-    private readonly IAccountBusinessRules _accountBusiness;
+    private readonly ITransferService _transferBusiness;
+    private readonly IAccountService _accountBusiness;
 
-    public TransfersController(IUnitOfWork unitOfWork, ITransferBusinessRules transferBusiness, IAccountBusinessRules accountBusiness)
+    public TransfersController(IUnitOfWork unitOfWork, ITransferService transferBusiness, IAccountService accountBusiness)
     {
         _unitOfWork = unitOfWork;
         _transferBusiness = transferBusiness;

@@ -1,17 +1,18 @@
 using AutoMapper;
 using OpenBank.Api.Shared;
+using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.API.Application.Services.Logic;
 
-public class AccountBusinessRules : IAccountBusinessRules
+public class AccountService : IAccountService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public AccountBusinessRules(IUnitOfWork unitOfWork, IMapper mapper)
+    public AccountService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
@@ -22,13 +23,21 @@ public class AccountBusinessRules : IAccountBusinessRules
     /// <exception>Exception in case something fails </exception>
     /// <returns>A Task with the request back if succeded the creation</returns>
     /// </summary>
-    public async Task<(bool, Account)> CreateAccount(int idUser, Account createAccount)
+    public async Task<AccountResponse> CreateAccount(int idUser, CreateAccountRequest createAccount)
     {
         try
         {
-            var result = await _unitOfWork.accountRepository.AddAsync(createAccount);
+            Account account = new Account()
+            {
+                Balance = createAccount.Amount,
+                Created_at = DateTime.UtcNow,
+                Currency = createAccount.Currency,
+                UserId = idUser
+            };
 
-            return result.Item1 <= 0 ? (false, new Account()) : (true, result.Item2);
+            var result = await _unitOfWork.accountRepository.AddAsync(account);
+
+            return result.Item1 <= 0 ? new AccountResponse() : _mapper.Map<Account, AccountResponse>(result.Item2);
         }
         catch (Exception e)
         {
@@ -65,12 +74,16 @@ public class AccountBusinessRules : IAccountBusinessRules
     /// <exception>Exception in case something fails | Forbidden account in case the user is not the owner of the account </exception>
     /// <returns>List of AccountResponse</returns>
     /// </summary>
-    public async Task<List<Account>> GetAccounts(int userId)
+    public async Task<List<AccountResponse>> GetAccounts(int userId)
     {
         try
         {
             var accounts = await _unitOfWork.accountRepository.GetAccountsAsync(userId);
-            return accounts;
+
+            var accountResponseDTO = new List<AccountResponse>();
+            accounts.ForEach(acc => accountResponseDTO.Add(_mapper.Map<Account, AccountResponse>(acc)));
+
+            return accountResponseDTO;
         }
         catch (Exception e)
         {

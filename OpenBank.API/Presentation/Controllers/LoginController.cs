@@ -10,9 +10,9 @@ namespace OpenBank.API.Controllers;
 public class LoginController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IUserBusinessRules _userBusinessRules;
+    private readonly IUserService _userBusinessRules;
 
-    public LoginController(IUnitOfWork unitOfWork, IUserBusinessRules userBusinessRules)
+    public LoginController(IUnitOfWork unitOfWork, IUserService userBusinessRules)
     {
         _unitOfWork = unitOfWork;
         _userBusinessRules = userBusinessRules;

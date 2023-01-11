@@ -15,11 +15,11 @@ namespace OpenBank.API.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IAccountBusinessRules _accountBusiness;
-    private readonly ITransferBusinessRules _transferBusiness;
+    private readonly IAccountService _accountBusiness;
+    private readonly ITransferService _transferBusiness;
     private readonly IMapper _mapper;
 
-    public AccountsController(IUnitOfWork unitOfWork, IAccountBusinessRules accountBusinessRules, ITransferBusinessRules transferBusinessRules, IMapper mapper)
+    public AccountsController(IUnitOfWork unitOfWork, IAccountService accountBusinessRules, ITransferService transferBusinessRules, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _accountBusiness = accountBusinessRules;
@@ -43,22 +43,9 @@ public class AccountsController : ControllerBase
 
         try
         {
-            Account account = new Account()
-            {
-                Balance = accountRequest.Amount,
-                Created_at = DateTime.UtcNow,
-                Currency = accountRequest.Currency,
-                UserId = userId
-            };
+            var result = await _accountBusiness.CreateAccount(userId, accountRequest);
 
-            (bool, Account) result = await _accountBusiness.CreateAccount(userId, account);
-
-            if (!result.Item1)
-                return Problem();
-
-            var response = _mapper.Map<Account, AccountResponse>(result.Item2);
-
-            return Ok(response);
+            return (result is null) ? Problem() : Ok(result);
         }
         catch (Exception e)
         {
@@ -85,16 +72,12 @@ public class AccountsController : ControllerBase
 
         try
         {
-            List<Account> accounts = await _accountBusiness.GetAccounts(userId);
+            var accounts = await _accountBusiness.GetAccounts(userId);
 
             if (accounts == null || accounts.Count == 0)
                 return NotFound("This user has no accounts.");
 
-            List<AccountResponse> accountResponseDTO = new List<AccountResponse>();
-
-            accounts.ForEach(acc => accountResponseDTO.Add(_mapper.Map<Account, AccountResponse>(acc)));
-
-            return Ok(accountResponseDTO);
+            return Ok(accounts);
         }
         catch (Exception e)
         {
