@@ -1,19 +1,19 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
-using OpenBank.API.Application.Interfaces;
-using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
+using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 
-namespace OpenBank.API.Domain.Business.Logic;
+namespace OpenBank.API.Application.Services.Logic;
 
 public class UserBusinessRules : IUserBusinessRules
 {
-    private readonly IUnitOfWork _unitOfwork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
     public UserBusinessRules(IUnitOfWork unitOfwork, IMapper mapper)
     {
-        _unitOfwork = unitOfwork;
+        _unitOfWork = unitOfwork;
         _mapper = mapper;
     }
 
@@ -25,7 +25,7 @@ public class UserBusinessRules : IUserBusinessRules
 
             createUserRequest.Password = pwHasher.HashPassword(createUserRequest.UserName, createUserRequest.Password);
 
-            User createdUser = await _unitOfwork.userRepository.CreateUserAsync(createUserRequest);           
+            User createdUser = await _unitOfWork.userRepository.CreateUserAsync(createUserRequest);
 
             return createdUser;
         }
@@ -40,7 +40,7 @@ public class UserBusinessRules : IUserBusinessRules
     {
         try
         {
-            List<User> users = _unitOfwork.userRepository.GetAllUsers();
+            var users = _unitOfWork.userRepository.GetAllUsers();
             return users;
         }
         catch (Exception e)
@@ -54,7 +54,7 @@ public class UserBusinessRules : IUserBusinessRules
     {
         try
         {
-            User? existentUser = await _unitOfwork.userRepository.GetUserAsync(username);
+            var existentUser = await _unitOfWork.userRepository.GetUserAsync(username);
 
             if (string.IsNullOrWhiteSpace(existentUser?.UserName))
                 return 0;
@@ -74,7 +74,7 @@ public class UserBusinessRules : IUserBusinessRules
 
     public async Task<bool> IsUsernameAvailableAsync(string username)
     {
-        User? user = await _unitOfwork.userRepository.GetUserAsync(username);
-        return user?.UserName.ToLower() != username.ToLower();
+        var user = await _unitOfWork.userRepository.GetUserAsync(username);
+        return !string.Equals(user?.UserName, username, StringComparison.CurrentCultureIgnoreCase);
     }
 }

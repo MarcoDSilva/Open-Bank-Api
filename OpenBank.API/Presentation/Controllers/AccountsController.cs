@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.DTO;
 using Microsoft.AspNetCore.Authorization;
-using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 using AutoMapper;
 using OpenBank.Api.Shared;
@@ -105,7 +105,7 @@ public class AccountsController : ControllerBase
 
 
     [HttpGet]
-    [Route("{id}")]
+    [Route("{id:int}")]
     [ProducesResponseType(typeof(AccountMovement), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]

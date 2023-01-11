@@ -2,7 +2,7 @@ using OpenBank.API.Application.DTO;
 using OpenBank.API.Enum;
 using OpenBank.API.Domain.Models.Entities;
 
-namespace OpenBank.API.Domain.Business.Interfaces;
+namespace OpenBank.API.Application.Services.Interfaces;
 
 public interface ITransferBusinessRules
 {

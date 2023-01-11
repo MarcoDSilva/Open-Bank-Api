@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using OpenBank.Api.Data;
 using OpenBank.API.Domain.Models.Entities;
-using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
 
-namespace OpenBank.API.Application.Repositories;
+namespace OpenBank.API.Application.Repository.Repositories;
 
 public class AccountRepository : IAccountRepository
 {
@@ -35,18 +35,18 @@ public class AccountRepository : IAccountRepository
     /// <returns>AccountResponse / empty AccountResponse</returns>
     public async Task<Account?> GetByIdAsync(int accountId, int userId)
     {
-        List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
-        Account? account = accountList.Find(acc => acc.Id == accountId && acc.UserId == userId);
+        var accountList = await _openBankApiDbContext.Accounts.ToListAsync();
+        var account = accountList.Find(acc => acc.Id == accountId && acc.UserId == userId);
 
-        return account is null ? null : account;
+        return account;
     }
 
     public async Task<Account?> GetByIdAsync(int accountId)
     {
-        List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
-        Account? account = accountList.Find(acc => acc.Id == accountId);
+        var accountList = await _openBankApiDbContext.Accounts.ToListAsync();
+        var account = accountList.Find(acc => acc.Id == accountId);
 
-        return account is null ? null : account;
+        return account;
     }
 
     ///<param>userId - User identifier</param>
@@ -56,8 +56,8 @@ public class AccountRepository : IAccountRepository
     /// </summary>
     public async Task<List<Account>> GetAccountsAsync(int userId)
     {
-        List<Account> existantAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
-        List<Account> userAccounts = existantAccounts.FindAll(acc => acc.UserId == userId).ToList();
+        var existentAccounts = await _openBankApiDbContext.Accounts.ToListAsync();
+        var userAccounts = existentAccounts.FindAll(acc => acc.UserId == userId).ToList();
 
         return userAccounts;
     }
@@ -70,15 +70,15 @@ public class AccountRepository : IAccountRepository
     public async Task<List<Transfer>> GetAccountMovementsAsync(int accountId)
     {
         var existantMovements = await _openBankApiDbContext.Transfers.ToListAsync();
-        List<Transfer> movements = existantMovements.FindAll(mov => mov.AccountId == accountId).ToList();
+        var movements = existantMovements.FindAll(mov => mov.AccountId == accountId).ToList();
 
         return movements;
     }
 
     public async Task<bool> IsUserAccountAsync(int accountId, int userId)
     {
-        List<Account> accountList = await _openBankApiDbContext.Accounts.ToListAsync();
-        Account? account = accountList.Find(acc => acc.Id == accountId);
+        var accountList = await _openBankApiDbContext.Accounts.ToListAsync();
+        var account = accountList.Find(acc => acc.Id == accountId);
 
         return account?.UserId == userId;
     }

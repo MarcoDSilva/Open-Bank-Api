@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using OpenBank.Api.Data;
-using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 
-namespace OpenBank.API.Application.Repositories;
+namespace OpenBank.API.Application.Repository.Repositories;
 
 public class DocumentRepository : IDocumentRepository
 {
@@ -25,16 +25,16 @@ public class DocumentRepository : IDocumentRepository
 
     public async Task<Document?> GetDocumentAsync(int documentId)
     {
-        List<Document> documents = await _openBankApiDbContext.Documents.ToListAsync();
-        Document? document = documents.Find(doc => doc.Id == documentId);
+        var documents = await _openBankApiDbContext.Documents.ToListAsync();
+        var document = documents.Find(doc => doc.Id == documentId);
 
         return document;
     }
 
     public async Task<List<Document>> GetDocumentsAsync(int accountId)
     {
-        List<Document> documents = await _openBankApiDbContext.Documents.ToListAsync();
-        List<Document> userDocuments = documents.FindAll(doc => doc.AccountId == accountId);
+        var documents = await _openBankApiDbContext.Documents.ToListAsync();
+        var userDocuments = documents.FindAll(doc => doc.AccountId == accountId);
 
         return userDocuments;
     }

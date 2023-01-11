@@ -1,10 +1,10 @@
 using OpenBank.Api.Shared;
 using OpenBank.API.Enum;
-using OpenBank.API.Application.Interfaces;
-using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
+using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 
-namespace OpenBank.API.Domain.Business.Logic;
+namespace OpenBank.API.Application.Services.Logic;
 
 public class TransferBusinessRules : ITransferBusinessRules
 {
@@ -21,7 +21,7 @@ public class TransferBusinessRules : ITransferBusinessRules
         Account? accountTo = await _unitOfWork.accountRepository.GetByIdAsync(movement.accountTo);
 
         // validation
-        (StatusCode, string) validation = ValidateAccountsForTransfer(accountFrom, accountTo, movement, userId);
+        var validation = ValidateAccountsForTransfer(accountFrom, accountTo, movement, userId);
         if (validation.Item1 != StatusCode.Sucess)
         {
             return validation;
@@ -57,10 +57,7 @@ public class TransferBusinessRules : ITransferBusinessRules
 
             bool isSaved = await _unitOfWork.transferRepository.SaveAsync();
 
-            if (isSaved)
-                return (StatusCode.Sucess, "Transfer was completed with success");
-
-            return (StatusCode.ServerError, WarningDescriptions.FailedTransfer);
+            return isSaved ? (StatusCode.Sucess, "Transfer was completed with success") : (StatusCode.ServerError, WarningDescriptions.FailedTransfer);
         }
         catch (Exception e)
         {

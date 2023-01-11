@@ -3,9 +3,9 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using OpenBank.API.Application.DTO;
-using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
 
-namespace OpenBank.API.Application.Repositories;
+namespace OpenBank.API.Application.Repository.Repositories;
 
 public class TokenHandler : ITokenHandler
 {
@@ -21,11 +21,11 @@ public class TokenHandler : ITokenHandler
     {
         DateTime expirationDate = DateTime.UtcNow.AddMinutes(ExpirationTime);
 
-        List<Claim> claims = new List<Claim>()
+        var claims = new List<Claim>()
         {
-            new Claim("userId", userId.ToString()),
-            new Claim(ClaimTypes.Expiration, expirationDate.ToString()),
-            new Claim(ClaimTypes.NameIdentifier, loginUserRequest.UserName)
+            new ("userId", userId.ToString()),
+            new (ClaimTypes.Expiration, expirationDate.ToString()),
+            new (ClaimTypes.NameIdentifier, loginUserRequest.UserName)
         };
 
         SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -58,7 +58,7 @@ public class TokenHandler : ITokenHandler
         try
         {
             string tokenWithoutBearer = tokenWithBearer.Replace("Bearer ", "");
-            IEnumerable<Claim> claims = new System.IdentityModel.Tokens.Jwt.JwtSecurityToken(tokenWithoutBearer).Claims;
+            var claims = new JwtSecurityToken(tokenWithoutBearer).Claims;
 
             string user = claims.First(c => c.Type == "userId").Value;
 

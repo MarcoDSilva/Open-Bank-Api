@@ -1,11 +1,10 @@
 using OpenBank.API.Domain.Models.Entities;
 
-namespace OpenBank.API.Domain.Business.Interfaces;
+namespace OpenBank.API.Application.Repository.Interfaces;
 
-public interface IDocumentBusinessRules
+public interface IDocumentRepository
 {
     Task<Document?> AddAsync(Document document);
     Task<List<Document>> GetDocumentsAsync(int accountId);
-    Task<Document?> GetDocumentAsync(int docId);
-
+    Task<Document?> GetDocumentAsync(int documentId);
 }

@@ -1,10 +1,9 @@
-using OpenBank.API.Application.DTO;
 using OpenBank.Api.Data;
 using OpenBank.API.Domain.Models.Entities;
-using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace OpenBank.API.Application.Repositories;
+namespace OpenBank.API.Application.Repository.Repositories;
 
 public class UserRepository : IUserRepository
 {
@@ -31,8 +30,8 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetUserAsync(string username)
     {
-        List<User> userList = await _openBankApiDbContext.Users.ToListAsync();
-        User? user = userList.Find(m => m.UserName.ToLower().Equals(username.ToLower()));
+        var userList = await _openBankApiDbContext.Users.ToListAsync();
+        var user = userList.Find(m => m.UserName.ToLower().Equals(username.ToLower()));
 
         return user;
     }

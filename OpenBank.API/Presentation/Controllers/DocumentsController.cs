@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.DTO;
-using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 using AutoMapper;
 using OpenBank.Api.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 
 namespace OpenBank.API.Controllers;
 
@@ -107,7 +106,7 @@ public class DocumentsController : Controller
         }
     }
 
-    [HttpGet("accounts/{accountId}/documents")]
+    [HttpGet("accounts/{accountId:int}/documents")]
     [ProducesResponseType(typeof(IEnumerable<DocumentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -146,7 +145,7 @@ public class DocumentsController : Controller
         }
     }
 
-    [HttpGet("accounts/{accountId}/documents/{docId}")]
+    [HttpGet("accounts/{accountId:int}/documents/{docId:int}")]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]

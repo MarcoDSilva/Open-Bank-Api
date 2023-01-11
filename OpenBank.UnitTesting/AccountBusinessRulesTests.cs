@@ -1,8 +1,8 @@
 using AutoMapper;
 using Moq;
-using OpenBank.API.Application.Interfaces;
-using OpenBank.API.Domain.Business.Logic;
-using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
+using OpenBank.API.Application.Services.Logic;
+using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 using OpenBank.Api.Shared;
 

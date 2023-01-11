@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.DTO;
-using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 using AutoMapper;
 
@@ -40,7 +40,7 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Users(CreateUserRequest createUser)
     {
-        bool isUsernameAvailable = await _userBusinessRules.IsUsernameAvailableAsync(createUser.Username);
+        var isUsernameAvailable = await _userBusinessRules.IsUsernameAvailableAsync(createUser.Username);
 
         if (!isUsernameAvailable)
             return BadRequest($"Username {createUser.Username} already in use, please register with a different username.");
@@ -56,8 +56,8 @@ public class UsersController : ControllerBase
                 Created_at = DateTime.UtcNow
             };
 
-            User result = await _userBusinessRules.CreateUserAsync(newUser);
-            CreateUserResponse userDTO = _mapper.Map<User, CreateUserResponse>(result);
+            var result = await _userBusinessRules.CreateUserAsync(newUser);
+            var userDTO = _mapper.Map<User, CreateUserResponse>(result);
 
             return Ok(userDTO);
         }

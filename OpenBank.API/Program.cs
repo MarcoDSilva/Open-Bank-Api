@@ -1,22 +1,21 @@
 using OpenBank.Api.Data;
-using OpenBank.API.Application.Interfaces;
-using OpenBank.API.Application.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.OpenApi.Models;
-using OpenBank.API.Domain.Business.Interfaces;
-using OpenBank.API.Domain.Business.Logic;
-using OpenBank.API.Application;
-using OpenBank.API.Domain.Models.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 
+builder.Services.AddServices();
+builder.Services.AddRepositories();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -48,21 +47,8 @@ builder.Services.AddDbContext<OpenBankApiDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("open-bank-api"));
 });
 
-// registering repositories
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<ITransferRepository, TransferRepository>();
-builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
-
-builder.Services.AddScoped<IUserBusinessRules, UserBusinessRules>();
-builder.Services.AddScoped<IAccountBusinessRules, AccountBusinessRules>();
-builder.Services.AddScoped<ITransferBusinessRules, TransferBusinessRules>();
-builder.Services.AddScoped<IDocumentBusinessRules, DocumentBusinessRules>();
-
-builder.Services.AddScoped<ITokenHandler, OpenBank.API.Application.Repositories.TokenHandler>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddAuthentication(option =>
 {

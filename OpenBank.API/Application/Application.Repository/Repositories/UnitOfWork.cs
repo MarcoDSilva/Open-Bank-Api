@@ -1,6 +1,6 @@
-using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
 
-namespace OpenBank.API.Application;
+namespace OpenBank.API.Application.Repository.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {

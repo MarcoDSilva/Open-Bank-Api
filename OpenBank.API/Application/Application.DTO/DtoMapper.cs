@@ -1,5 +1,4 @@
 using AutoMapper;
-using OpenBank.API.Application.Repositories;
 using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.API.Application.DTO;

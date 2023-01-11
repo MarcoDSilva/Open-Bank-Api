@@ -1,8 +1,8 @@
 using OpenBank.Api.Data;
 using OpenBank.API.Domain.Models.Entities;
-using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
 
-namespace OpenBank.API.Application.Repositories;
+namespace OpenBank.API.Application.Repository.Repositories;
 
 public class TransferRepository : ITransferRepository
 {

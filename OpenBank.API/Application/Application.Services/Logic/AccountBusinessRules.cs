@@ -1,10 +1,10 @@
 using AutoMapper;
 using OpenBank.Api.Shared;
-using OpenBank.API.Application.Interfaces;
-using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
+using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
 
-namespace OpenBank.API.Domain.Business.Logic;
+namespace OpenBank.API.Application.Services.Logic;
 
 public class AccountBusinessRules : IAccountBusinessRules
 {
@@ -28,10 +28,7 @@ public class AccountBusinessRules : IAccountBusinessRules
         {
             var result = await _unitOfWork.accountRepository.AddAsync(createAccount);
 
-            if (result.Item1 <= 0)
-                return (false, new Account());
-
-            return (true, result.Item2);
+            return result.Item1 <= 0 ? (false, new Account()) : (true, result.Item2);
         }
         catch (Exception e)
         {
@@ -47,13 +44,13 @@ public class AccountBusinessRules : IAccountBusinessRules
     /// </summary>
     public async Task<Account?> GetAccountById(int accountId, int userId)
     {
-        bool isUserAccount = await _unitOfWork.accountRepository.IsUserAccountAsync(accountId, userId);
+        var isUserAccount = await _unitOfWork.accountRepository.IsUserAccountAsync(accountId, userId);
         if (!isUserAccount)
             throw new ForbiddenAccountAccessException("Bearer");
 
         try
         {
-            Account? account = await _unitOfWork.accountRepository.GetByIdAsync(accountId, userId);
+            var account = await _unitOfWork.accountRepository.GetByIdAsync(accountId, userId);
             return account;
         }
         catch (Exception e)
@@ -72,7 +69,7 @@ public class AccountBusinessRules : IAccountBusinessRules
     {
         try
         {
-            List<Account> accounts = await _unitOfWork.accountRepository.GetAccountsAsync(userId);
+            var accounts = await _unitOfWork.accountRepository.GetAccountsAsync(userId);
             return accounts;
         }
         catch (Exception e)

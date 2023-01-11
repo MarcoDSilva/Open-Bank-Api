@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using OpenBank.API.Application.Interfaces;
+using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.DTO;
-using OpenBank.API.Domain.Business.Interfaces;
+using OpenBank.API.Application.Services.Interfaces;
 
 namespace OpenBank.API.Controllers;
 

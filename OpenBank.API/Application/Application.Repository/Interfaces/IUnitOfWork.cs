@@ -1,4 +1,4 @@
-namespace OpenBank.API.Application.Interfaces;
+namespace OpenBank.API.Application.Repository.Interfaces;
 
 public interface IUnitOfWork
 {
