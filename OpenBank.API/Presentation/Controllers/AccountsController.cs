@@ -116,15 +116,12 @@ public class AccountsController : ControllerBase
 
         try
         {
-            List<Transfer> movements = await _transferBusiness.GetAccountMovementsAsync(account.Id);
+            var movements = await _transferBusiness.GetAccountMovementsAsync(account.Id);
 
-            List<MovementResponse> movementsDTO = new List<MovementResponse>();
-            movements.ForEach(mov => movementsDTO.Add(_mapper.Map<Transfer, MovementResponse>(mov)));
-
-            AccountMovement accountWithMovements = new AccountMovement()
+            var accountWithMovements = new AccountMovement()
             {
                 Account = _mapper.Map<Account, AccountResponse>(account),
-                Movements = movementsDTO
+                Movements = movements
             };
 
             return Ok(accountWithMovements);

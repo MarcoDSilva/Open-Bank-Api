@@ -1,5 +1,7 @@
+using AutoMapper;
 using Moq;
 using OpenBank.Api.Shared;
+using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Application.Services.Logic;
@@ -13,14 +15,17 @@ public class TransferServiceTests
 {
     private ITransferService _transferBusiness;
     private Mock<IUnitOfWork> _unitOfWork;
-    private Movement _movement;
-    private Account _accountFrom;
-    private Account _accountTo;
+    private Mock<IMapper> _mapper;
+
+    private TransferRequest _movement;
+    private Account _From_account;
+    private Account _To_account;
 
     public TransferServiceTests()
     {
         _unitOfWork = new Mock<IUnitOfWork>();
-        _transferBusiness = new TransferService(_unitOfWork.Object);
+        _mapper = new Mock<IMapper>();
+        _transferBusiness = new TransferService(_unitOfWork.Object, _mapper.Object);
 
         SetUp();
     }
@@ -28,18 +33,18 @@ public class TransferServiceTests
     [SetUp]
     public void SetUp()
     {
-        _movement = new Movement()
+        _movement = new TransferRequest()
         {
-            accountFrom = 1,
-            accountTo = 2,
+            From_account = 1,
+            To_account = 2,
             Amount = 5
         };
 
-        _accountFrom = SetAccount(1);
-        _accountTo = SetAccount(2);
+        _From_account = SetAccount(1);
+        _To_account = SetAccount(2);
 
-        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_accountFrom.Id)).ReturnsAsync(_accountFrom);
-        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_accountTo.Id)).ReturnsAsync(_accountTo);
+        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_From_account.Id)).ReturnsAsync(_From_account);
+        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_To_account.Id)).ReturnsAsync(_To_account);
 
         _unitOfWork.Setup(t => t.transferRepository.SaveAsync()).ReturnsAsync(true);
     }
@@ -60,7 +65,7 @@ public class TransferServiceTests
     [Test]
     public async Task TransferRequest_CorrectRequest_ReturnsOk()
     {
-        var result = await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId);
+        var result = await _transferBusiness.TransferRequestAsync(_movement, _From_account.UserId);
 
         Assert.That(result, Is.EqualTo("Transfer was completed with success"));
     }
@@ -80,11 +85,11 @@ public class TransferServiceTests
     [Test]
     public void TransferRequest_DifferentCurrenciesBetweenAccounts_ThrowsDifferentCurrenciesException()
     {
-        _accountFrom.Currency = "USD";
-        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_accountFrom.Id)).ReturnsAsync(_accountFrom);
-        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_accountTo.Id)).ReturnsAsync(_accountTo);
+        _From_account.Currency = "USD";
+        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_From_account.Id)).ReturnsAsync(_From_account);
+        _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_To_account.Id)).ReturnsAsync(_To_account);
 
-        var result = Assert.ThrowsAsync<DifferentCurrenciesException>(async () => await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId));
+        var result = Assert.ThrowsAsync<DifferentCurrenciesException>(async () => await _transferBusiness.TransferRequestAsync(_movement, _From_account.UserId));
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result?.Message, Is.EqualTo(AccountDescriptions.DifferentCurrencies));
@@ -95,7 +100,7 @@ public class TransferServiceTests
     {
         _movement.Amount = 11;
 
-        var result = Assert.ThrowsAsync<LowerBalanceException>(async () => await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId));
+        var result = Assert.ThrowsAsync<LowerBalanceException>(async () => await _transferBusiness.TransferRequestAsync(_movement, _From_account.UserId));
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result?.Message, Is.EqualTo(AccountDescriptions.LowerBalance));
@@ -107,9 +112,9 @@ public class TransferServiceTests
     [Test]
     public void TransferRequest_ServerFails_ThrowsException()
     {    
-        _unitOfWork.Setup(acc => acc.accountRepository.Update(_accountFrom)).Throws(new Exception());
+        _unitOfWork.Setup(acc => acc.accountRepository.Update(_From_account)).Throws(new Exception());
 
-        var result = Assert.ThrowsAsync<Exception>(async () => await _transferBusiness.TransferRequestAsync(_movement, _accountFrom.UserId));
+        var result = Assert.ThrowsAsync<Exception>(async () => await _transferBusiness.TransferRequestAsync(_movement, _From_account.UserId));
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result?.Message, Is.EqualTo(WarningDescriptions.FailedTransfer));

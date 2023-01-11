@@ -39,15 +39,8 @@ public class TransfersController : ControllerBase
             return Unauthorized(AccountDescriptions.NotLoggedIn);
 
         try
-        {
-            Movement movement = new Movement()
-            {
-                accountFrom = transferRequest.From_account,
-                accountTo = transferRequest.To_account,
-                Amount = transferRequest.Amount
-            };
-
-            var result = await _transferBusiness.TransferRequestAsync(movement, userId);
+        {   
+            var result = await _transferBusiness.TransferRequestAsync(transferRequest, userId);
             return Ok(result);
 
         }

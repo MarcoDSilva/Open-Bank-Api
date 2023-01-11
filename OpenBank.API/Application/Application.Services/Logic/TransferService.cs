@@ -1,4 +1,6 @@
+using AutoMapper;
 using OpenBank.Api.Shared;
+using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
@@ -8,31 +10,34 @@ namespace OpenBank.API.Application.Services.Logic;
 public class TransferService : ITransferService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-    public TransferService(IUnitOfWork unitOfWork)
+
+    public TransferService(IUnitOfWork unitOfWork, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
+        _mapper = mapper;
     }
 
-    public async Task<string> TransferRequestAsync(Movement movement, int userId)
+    public async Task<string> TransferRequestAsync(TransferRequest request, int userId)
     {
-        Account? accountFrom = await _unitOfWork.accountRepository.GetByIdAsync(movement.accountFrom);
-        Account? accountTo = await _unitOfWork.accountRepository.GetByIdAsync(movement.accountTo);
+        Account? accountFrom = await _unitOfWork.accountRepository.GetByIdAsync(request.From_account);
+        Account? accountTo = await _unitOfWork.accountRepository.GetByIdAsync(request.To_account);
 
         if (accountFrom is null || accountTo is null) throw new MovementAccountNotFoundException(AccountDescriptions.AccountNotFound);
         if (accountFrom.UserId != userId) throw new ForbiddenAccountAccessException(AccountDescriptions.BearerNotAllowed);
-        if (accountTo.Balance < movement.Amount) throw new LowerBalanceException(AccountDescriptions.LowerBalance);
+        if (accountTo.Balance < request.Amount) throw new LowerBalanceException(AccountDescriptions.LowerBalance);
         if (accountTo.Currency != accountFrom.Currency) throw new DifferentCurrenciesException(AccountDescriptions.DifferentCurrencies);
 
         // update values
-        accountFrom.Balance -= movement.Amount;
-        accountTo.Balance += movement.Amount;
+        accountFrom.Balance -= request.Amount;
+        accountTo.Balance += request.Amount;
 
         // DTO to model for updates
         Transfer accountFromMovement = new Transfer()
         {
             Account = accountFrom,
-            Amount = movement.Amount,
+            Amount = request.Amount,
             Created_at = DateTime.UtcNow,
             OperationType = AccountDescriptions.Debit
         };
@@ -40,7 +45,7 @@ public class TransferService : ITransferService
         Transfer accountToMovement = new Transfer()
         {
             Account = accountTo,
-            Amount = movement.Amount,
+            Amount = request.Amount,
             Created_at = DateTime.UtcNow,
             OperationType = AccountDescriptions.Credit
         };
@@ -62,12 +67,16 @@ public class TransferService : ITransferService
         }
     }
 
-    public async Task<List<Transfer>> GetAccountMovementsAsync(int accountId)
+    public async Task<List<MovementResponse>> GetAccountMovementsAsync(int accountId)
     {
         try
         {
             var movements = await _unitOfWork.accountRepository.GetAccountMovementsAsync(accountId);
-            return movements;
+
+            List<MovementResponse> movementsDTO = new List<MovementResponse>();
+            movements.ForEach(mov => movementsDTO.Add(_mapper.Map<Transfer, MovementResponse>(mov)));
+
+            return movementsDTO;
         }
         catch (Exception e)
         {
