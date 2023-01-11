@@ -47,19 +47,8 @@ public class UsersController : ControllerBase
 
         try
         {
-            User newUser = new User()
-            {
-                Email = createUser.Email,
-                FullName = createUser.FullName,
-                Password = createUser.Password,
-                UserName = createUser.Username,
-                Created_at = DateTime.UtcNow
-            };
-
-            var result = await _userBusinessRules.CreateUserAsync(newUser);
-            var userDTO = _mapper.Map<User, CreateUserResponse>(result);
-
-            return Ok(userDTO);
+            var result = await _userBusinessRules.CreateUserAsync(createUser);
+            return Ok(result);
         }
         catch (Exception e)
         {

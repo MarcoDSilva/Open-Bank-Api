@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
@@ -17,17 +18,25 @@ public class UserBusinessRules : IUserBusinessRules
         _mapper = mapper;
     }
 
-    public async Task<User> CreateUserAsync(User createUserRequest)
+    public async Task<CreateUserResponse> CreateUserAsync(CreateUserRequest createUserRequest)
     {
         try
         {
             PasswordHasher<string> pwHasher = new PasswordHasher<string>();
 
-            createUserRequest.Password = pwHasher.HashPassword(createUserRequest.UserName, createUserRequest.Password);
+            User newUser = new User()
+            {
+                Email = createUserRequest.Email,
+                FullName = createUserRequest.FullName,
+                Password = pwHasher.HashPassword(createUserRequest.Username, createUserRequest.Password),
+                UserName = createUserRequest.Username,
+                Created_at = DateTime.UtcNow
+            };
 
-            User createdUser = await _unitOfWork.userRepository.CreateUserAsync(createUserRequest);
+            var createdUser = await _unitOfWork.userRepository.CreateUserAsync(newUser);
+            var userDTO = _mapper.Map<User, CreateUserResponse>(createdUser);
 
-            return createdUser;
+            return userDTO;
         }
         catch (Exception e)
         {

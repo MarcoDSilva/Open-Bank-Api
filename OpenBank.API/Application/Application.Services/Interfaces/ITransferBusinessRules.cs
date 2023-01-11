@@ -6,6 +6,6 @@ namespace OpenBank.API.Application.Services.Interfaces;
 
 public interface ITransferBusinessRules
 {
-    Task<(StatusCode, string)> TransferRequestAsync(Movement transfer, int userId);
+    Task<string> TransferRequestAsync(Movement transfer, int userId);
     Task<List<Transfer>> GetAccountMovementsAsync(int accountId);
 }

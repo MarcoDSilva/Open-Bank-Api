@@ -48,25 +48,25 @@ public class TransfersController : ControllerBase
             };
 
             var result = await _transferBusiness.TransferRequestAsync(movement, userId);
+            return Ok(result);
 
-            switch (result.Item1)
-            {
-                case Enum.StatusCode.Sucess:
-                    return Ok(result.Item2);
-                case Enum.StatusCode.BadRequest:
-                    return BadRequest(result.Item2);
-                case Enum.StatusCode.NotFound:
-                    return NotFound(result.Item2);
-                case Enum.StatusCode.Forbidden:
-                    return Forbid(result.Item2);
-                default:
-                    return Ok(result.Item2);
-            }
         }
         catch (Exception e)
         {
             _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Transfers with the message: {e.Message}");
-            return Problem(e.Message);
+
+            switch (e)
+            {
+                case MovementAccountNotFoundException:
+                    return NotFound(e.Message);
+                case ForbiddenAccountAccessException:
+                    return Forbid(e.Message);
+                case LowerBalanceException:
+                case DifferentCurrenciesException:
+                    return BadRequest(e.Message);
+                default:
+                    return Problem(e.Message);
+            }
         }
     }
 }

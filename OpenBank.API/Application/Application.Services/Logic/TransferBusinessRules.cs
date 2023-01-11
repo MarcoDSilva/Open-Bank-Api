@@ -1,5 +1,4 @@
 using OpenBank.Api.Shared;
-using OpenBank.API.Enum;
 using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Domain.Models.Entities;
@@ -15,17 +14,15 @@ public class TransferBusinessRules : ITransferBusinessRules
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<(StatusCode, string)> TransferRequestAsync(Movement movement, int userId)
+    public async Task<string> TransferRequestAsync(Movement movement, int userId)
     {
         Account? accountFrom = await _unitOfWork.accountRepository.GetByIdAsync(movement.accountFrom);
         Account? accountTo = await _unitOfWork.accountRepository.GetByIdAsync(movement.accountTo);
 
-        // validation
-        var validation = ValidateAccountsForTransfer(accountFrom, accountTo, movement, userId);
-        if (validation.Item1 != StatusCode.Sucess)
-        {
-            return validation;
-        }
+        if (accountFrom is null || accountTo is null) throw new MovementAccountNotFoundException(AccountDescriptions.AccountNotFound);
+        if (accountTo.UserId != userId) throw new ForbiddenAccountAccessException(AccountDescriptions.BearerNotAllowed);
+        if (accountTo.Balance < movement.Amount) throw new LowerBalanceException(AccountDescriptions.LowerBalance);
+        if (accountTo.Currency != accountFrom.Currency) throw new DifferentCurrenciesException(AccountDescriptions.DifferentCurrencies);
 
         // update values
         accountFrom.Balance -= movement.Amount;
@@ -57,7 +54,7 @@ public class TransferBusinessRules : ITransferBusinessRules
 
             bool isSaved = await _unitOfWork.transferRepository.SaveAsync();
 
-            return isSaved ? (StatusCode.Sucess, "Transfer was completed with success") : (StatusCode.ServerError, WarningDescriptions.FailedTransfer);
+            return isSaved ? "Transfer was completed with success" : WarningDescriptions.FailedTransfer;
         }
         catch (Exception e)
         {
@@ -69,7 +66,7 @@ public class TransferBusinessRules : ITransferBusinessRules
     {
         try
         {
-            List<Transfer> movements = await _unitOfWork.accountRepository.GetAccountMovementsAsync(accountId);
+            var movements = await _unitOfWork.accountRepository.GetAccountMovementsAsync(accountId);
             return movements;
         }
         catch (Exception e)
@@ -77,25 +74,5 @@ public class TransferBusinessRules : ITransferBusinessRules
             Console.WriteLine("Error: {0}", e.Message); //Log erro
             throw new Exception(e.Message);
         }
-    }
-
-    private (StatusCode, string) ValidateAccountsForTransfer(Account? fromAcc, Account? toAcc, Movement transfer, int userId)
-    {
-        if (fromAcc is null)
-            return (StatusCode.NotFound, AccountDescriptions.AccountNotFound);
-
-        if (toAcc is null)
-            return (StatusCode.NotFound, AccountDescriptions.AccountNotFound);
-
-        if (fromAcc.UserId != userId)
-            return (StatusCode.Forbidden, AccountDescriptions.BearerNotAllowed);
-
-        if (fromAcc.Balance < transfer.Amount)
-            return (StatusCode.BadRequest, AccountDescriptions.LowerBalance);
-
-        if (fromAcc.Currency != toAcc.Currency)
-            return (StatusCode.BadRequest, AccountDescriptions.DifferentCurrencies);
-
-        return (StatusCode.Sucess, "");
     }
 }
