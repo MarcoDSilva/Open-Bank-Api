@@ -63,7 +63,11 @@ public class TransferService : ITransferService
             bool isSaved = await _unitOfWork.transferRepository.SaveAsync();
 
             if (isSaved)
-                _producer.SendToKafka($"{request.Amount} {request.Currency} went from {request.From_account} to {request.To_account}");
+            {
+                var message = $"{request.Amount} {request.Currency} went from {request.From_account} to {request.To_account}";
+                _producer.Publish(message);
+            }
+            
 
             return isSaved ? "Transfer was completed with success" : WarningDescriptions.FailedTransfer;
         }

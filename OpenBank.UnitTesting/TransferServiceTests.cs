@@ -1,10 +1,10 @@
 using AutoMapper;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using OpenBank.Api.Shared;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.Services.Interfaces;
+using OpenBank.API.Application.Services.Kafka.Interfaces;
 using OpenBank.API.Application.Services.Logic;
 using OpenBank.API.Domain.Models.Entities;
 
@@ -16,7 +16,7 @@ public class TransferServiceTests
     private ITransferService _transferBusiness;
     private Mock<IUnitOfWork> _unitOfWork;
     private Mock<IMapper> _mapper;
-    private Mock<IConfiguration> _config;
+    private Mock<ITransferProducer> _producer;
 
     private TransferRequest _movement;
     private Account _From_account;
@@ -26,8 +26,8 @@ public class TransferServiceTests
     {
         _unitOfWork = new Mock<IUnitOfWork>();
         _mapper = new Mock<IMapper>();
-        _config = new Mock<IConfiguration>();
-        _transferBusiness = new TransferService(_unitOfWork.Object, _mapper.Object, _config.Object);
+        _producer = new Mock<ITransferProducer>();
+        _transferBusiness = new TransferService(_unitOfWork.Object, _mapper.Object, _producer.Object);
 
         SetUp();
     }

@@ -22,7 +22,7 @@ public class TransferProducer : ITransferProducer
         topic = _configuration["Kafka:Transfers"];
     }
 
-    public object SendToKafka(string message)
+    public object Publish(string message)
     {
         using (var producer = new ProducerBuilder<Null, string>(producerConfig).Build())
         {
@@ -32,7 +32,6 @@ public class TransferProducer : ITransferProducer
                     .ProduceAsync(topic, new Message<Null, string> { Value = message })
                     .GetAwaiter()
                     .GetResult();
-
             }
             catch (Exception e)
             {
