@@ -1,8 +1,9 @@
 using Confluent.Kafka;
+using OpenBank.API.Application.Services.Kafka.Interfaces;
 
 namespace OpenBank.API.Application.Services.Kafka.Producers;
 
-public class TransferProducer
+public class TransferProducer : ITransferProducer
 {
     readonly IConfiguration _configuration;
 
@@ -18,7 +19,7 @@ public class TransferProducer
             BootstrapServers = _configuration["Kafka:Bootstrap-Server"],
         };
 
-        topic = _configuration["Kafka:Topics:Transfers"];
+        topic = _configuration["Kafka:Transfers"];
     }
 
     public object SendToKafka(string message)
