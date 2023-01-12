@@ -7,9 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/OpenBank.API/OpenBank.API.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "${workspaceFolder}"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -19,9 +17,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/OpenBank.API/OpenBank.API.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "${workspaceFolder}"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -33,7 +29,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/OpenBank.API/OpenBank.API.csproj"
+                "${workspaceFolder}"
             ],
             "problemMatcher": "$msCompile"
         }

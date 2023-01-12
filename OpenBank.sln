@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenBank.API", "OpenBank.API\OpenBank.API.csproj", "{0B3FAD7D-39F0-4D90-8CF0-D3A715DCDE77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenBank.Infrastructure", "OpenBank.Infrastructure\OpenBank.Infrastructure.csproj", "{9189A70A-0987-4897-8E09-91199F15CBBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenBank.UnitTesting", "OpenBank.UnitTesting\OpenBank.UnitTesting.csproj", "{935237EE-600B-48DF-84CB-F561D2AFE903}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0B3FAD7D-39F0-4D90-8CF0-D3A715DCDE77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B3FAD7D-39F0-4D90-8CF0-D3A715DCDE77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B3FAD7D-39F0-4D90-8CF0-D3A715DCDE77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B3FAD7D-39F0-4D90-8CF0-D3A715DCDE77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9189A70A-0987-4897-8E09-91199F15CBBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9189A70A-0987-4897-8E09-91199F15CBBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9189A70A-0987-4897-8E09-91199F15CBBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9189A70A-0987-4897-8E09-91199F15CBBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{935237EE-600B-48DF-84CB-F561D2AFE903}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{935237EE-600B-48DF-84CB-F561D2AFE903}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{935237EE-600B-48DF-84CB-F561D2AFE903}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{935237EE-600B-48DF-84CB-F561D2AFE903}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
