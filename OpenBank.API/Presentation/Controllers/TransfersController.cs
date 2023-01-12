@@ -4,7 +4,6 @@ using OpenBank.Api.Shared;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.Services.Interfaces;
-using OpenBank.API.Domain.Models.Entities;
 
 namespace OpenBank.API.Controllers;
 

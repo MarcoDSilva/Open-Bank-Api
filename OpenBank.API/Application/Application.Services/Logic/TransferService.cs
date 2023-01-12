@@ -1,4 +1,5 @@
 using AutoMapper;
+using Confluent.Kafka;
 using OpenBank.Api.Shared;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Repository.Interfaces;
@@ -11,12 +12,14 @@ public class TransferService : ITransferService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IConfiguration _config;
 
 
-    public TransferService(IUnitOfWork unitOfWork, IMapper mapper)
+    public TransferService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _config = config;
     }
 
     public async Task<string> TransferRequestAsync(TransferRequest request, int userId)
@@ -59,9 +62,12 @@ public class TransferService : ITransferService
 
             bool isSaved = await _unitOfWork.transferRepository.SaveAsync();
 
+            if (isSaved)
+                SendToKafka($"${request.Amount} {request.Currency} went from {request.From_account} to {request.To_account}");
+
             return isSaved ? "Transfer was completed with success" : WarningDescriptions.FailedTransfer;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             throw new Exception(WarningDescriptions.FailedTransfer);
         }
@@ -73,7 +79,7 @@ public class TransferService : ITransferService
         {
             var movements = await _unitOfWork.accountRepository.GetAccountMovementsAsync(accountId);
 
-            List<MovementResponse> movementsDTO = new List<MovementResponse>();
+            var movementsDTO = new List<MovementResponse>();
             movements.ForEach(mov => movementsDTO.Add(_mapper.Map<Transfer, MovementResponse>(mov)));
 
             return movementsDTO;
@@ -83,5 +89,31 @@ public class TransferService : ITransferService
             Console.WriteLine("Error: {0}", e.Message); //Log erro
             throw new Exception(e.Message);
         }
+    }
+
+    private object SendToKafka(string message)
+    {
+        var topic = _config["Kafka:Transfers"];
+        var producerConfig = new ProducerConfig()
+        {
+            BootstrapServers = _config["Kafka:Bootstrap-Server"],
+        };
+
+        using (var producer = new ProducerBuilder<Null, string>(producerConfig).Build())
+        {
+            try
+            {
+                return producer
+                    .ProduceAsync(topic, new Message<Null, string> { Value = message })
+                    .GetAwaiter()
+                    .GetResult();
+
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine($"Message could not be produced. Error: ${e.Message}");
+            }
+        }
+        return null;
     }
 }

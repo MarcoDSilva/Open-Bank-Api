@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using OpenBank.Api.Shared;
 using OpenBank.API.Application.DTO;
@@ -6,7 +7,6 @@ using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.Services.Interfaces;
 using OpenBank.API.Application.Services.Logic;
 using OpenBank.API.Domain.Models.Entities;
-using OpenBank.API.Enum;
 
 namespace OpenBank.UnitTesting;
 
@@ -16,6 +16,7 @@ public class TransferServiceTests
     private ITransferService _transferBusiness;
     private Mock<IUnitOfWork> _unitOfWork;
     private Mock<IMapper> _mapper;
+    private Mock<IConfiguration> _config;
 
     private TransferRequest _movement;
     private Account _From_account;
@@ -25,7 +26,8 @@ public class TransferServiceTests
     {
         _unitOfWork = new Mock<IUnitOfWork>();
         _mapper = new Mock<IMapper>();
-        _transferBusiness = new TransferService(_unitOfWork.Object, _mapper.Object);
+        _config = new Mock<IConfiguration>();
+        _transferBusiness = new TransferService(_unitOfWork.Object, _mapper.Object, _config.Object);
 
         SetUp();
     }
@@ -111,7 +113,7 @@ public class TransferServiceTests
 
     [Test]
     public void TransferRequest_ServerFails_ThrowsException()
-    {    
+    {
         _unitOfWork.Setup(acc => acc.accountRepository.Update(_From_account)).Throws(new Exception());
 
         var result = Assert.ThrowsAsync<Exception>(async () => await _transferBusiness.TransferRequestAsync(_movement, _From_account.UserId));

@@ -4,13 +4,13 @@ networks:
   internal:
     driver: bridge
 services:
-  postgres:
-    ports:
-      - "2181:2181"
-    image: postgres:11.1
-    environment:    
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
+  # postgres:
+  #   ports:
+  #     - "2181:2181"
+  #   image: postgres:11.1
+  #   environment:    
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_USER: postgres
   # Kafka - zookeper
   zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1
