@@ -35,5 +35,16 @@ public class UserRepository : IUserRepository
 
         return user;
     }
+
+    public async Task<User> GetUserByAccountId(int accountId)
+    {
+        var userList = await _openBankApiDbContext.Users.ToListAsync();
+        var accountList = await _openBankApiDbContext.Accounts.ToListAsync();
+
+        var account = accountList.Find(acc => acc.Id == accountId);
+        var user = userList.Find(u => u.Id == account?.UserId);
+
+        return user;
+    }
 }
 

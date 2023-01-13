@@ -1,4 +1,6 @@
+using System.Text.Json;
 using Confluent.Kafka;
+using OpenBank.API.Application.DTO;
 
 namespace OpenBank.Infrastructure.Transfer.Kafka.Consumers;
 
@@ -33,7 +35,15 @@ public class TransferConsumerHandler : IHostedService
                 while (true)
                 {
                     var consumer = builder.Consume(cancelToken.Token);
-                    System.Console.WriteLine($"Message: {consumer.Message.Value} received from {consumer.TopicPartitionOffset}");
+                    var communication = JsonSerializer.Deserialize<TransferCommunication>(consumer.Message.Value);
+
+                    System.Console.WriteLine(
+                        $"Dear {communication.toUser.userName} you just received "
+                        + $"the ammount of {communication.amount} {communication.currency}, on your account number {communication.toUser.accountId} "
+                        + $"from the account number {communication.fromUser.accountId} that belongs to the user {communication.fromUser.userName}."
+                        + $"This was sent by the publisher from {consumer.TopicPartitionOffset}");
+
+                    // send email
                 }
             }
             catch (Exception)

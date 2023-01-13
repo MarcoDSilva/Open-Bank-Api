@@ -7,5 +7,6 @@ public interface IUserRepository
     Task<User> CreateUserAsync(User createUserRequest);
     Task<User?> GetUserAsync(string username);
     List<User> GetAllUsers(); // high chance this needs a DTO
+    Task<User> GetUserByAccountId(int accountId);
 }
 

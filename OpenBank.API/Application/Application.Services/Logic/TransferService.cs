@@ -1,4 +1,6 @@
+using System.Text.Json;
 using AutoMapper;
+using Microsoft.AspNetCore.Components.Web;
 using OpenBank.Api.Shared;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Repository.Interfaces;
@@ -64,11 +66,14 @@ public class TransferService : ITransferService
 
             if (isSaved)
             {
-                var message = $"{request.Amount} {request.Currency} went from {request.From_account} to {request.To_account}";
-                _producer.Publish(message);
-            }
-            
+                var communication = await CreateTransferCommunication(request);
 
+                if (communication is not null)
+                {
+                    var jsonData = JsonSerializer.Serialize(communication);
+                    _producer.Publish(jsonData);
+                }
+            }
             return isSaved ? "Transfer was completed with success" : WarningDescriptions.FailedTransfer;
         }
         catch (Exception)
@@ -93,5 +98,42 @@ public class TransferService : ITransferService
             Console.WriteLine("Error: {0}", e.Message); //Log erro
             throw new Exception(e.Message);
         }
-    }  
+    }
+
+    private async Task<TransferCommunication> CreateTransferCommunication(TransferRequest request)
+    {
+        try
+        {
+            UserCommunicationEmail fromUser = await CreateUserComnunication(request.From_account);
+            UserCommunicationEmail toUser = await CreateUserComnunication(request.To_account);
+
+            return new TransferCommunication()
+            {
+                id = Guid.NewGuid(),
+                amount = request.Amount,
+                currency = request.Currency,
+                fromUser = fromUser,
+                toUser = toUser
+            };
+        }
+        catch (Exception e)
+        {
+            _unitOfWork.loggerHandler.Log(LogLevel.Error, e.Message);
+            return new TransferCommunication();
+        }
+    }
+
+    private async Task<UserCommunicationEmail> CreateUserComnunication(int accountId)
+    {
+        var u = await _unitOfWork.userRepository.GetUserByAccountId(accountId);
+
+        if (u is null) throw new Exception("User not found, cannot send email");
+
+        return new UserCommunicationEmail()
+        {
+            accountId = accountId,
+            userName = u.UserName,
+            email = u.Email
+        };
+    }
 }
