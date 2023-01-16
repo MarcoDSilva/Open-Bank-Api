@@ -1,10 +1,11 @@
-using NETCore.MailKit.Core;
+using OpenBank.Infrastructure.Email.Service.Interface;
+using OpenBank.Infrastructure.Email.Service.Logic;
 using OpenBank.Infrastructure.Transfer.Kafka.Consumers;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
-        services.AddTransient<IEmailService, EmailService>();
+        services.AddSingleton<IEmailSender, EmailSender>();
         services.AddSingleton<IHostedService, TransferConsumerHandler>();
     })
     .Build();

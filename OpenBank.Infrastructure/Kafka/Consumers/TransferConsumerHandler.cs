@@ -1,20 +1,23 @@
 using System.Text.Json;
 using Confluent.Kafka;
+using NETCore.MailKit.Core;
 using OpenBank.API.Application.DTO;
 using OpenBank.Infrastructure.Email.Model;
+using OpenBank.Infrastructure.Email.Service.Interface;
 
 namespace OpenBank.Infrastructure.Transfer.Kafka.Consumers;
 
 public class TransferConsumerHandler : IHostedService
 {
     private readonly IConfiguration _configuration;
+    private readonly IEmailSender _emailService;
     private readonly string? topic;
 
-    public TransferConsumerHandler(IConfiguration configuration)
+    public TransferConsumerHandler(IConfiguration configuration, IEmailSender emailService)
     {
         _configuration = configuration;
         topic = _configuration["Kafka:Transfers"];
-
+        _emailService = emailService;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -54,10 +57,11 @@ public class TransferConsumerHandler : IHostedService
                         Username = _configuration["EmailConfiguration:Username"],
                         Password = _configuration["EmailConfiguration:Password"],
                         Port = int.Parse(_configuration["EmailConfiguration:Port"]),
-                        SmtpServer = _configuration["EmailConfiguration:Smtp"],
+                        SmtpServer = _configuration["EmailConfiguration:SmtpServer"],
                         Body = msg
                     };
 
+                    _emailService.SendEmailAsync(email);
                 }
             }
             catch (Exception)
