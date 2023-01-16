@@ -2,7 +2,7 @@ using OpenBank.Infrastructure.Entities.Models;
 
 namespace OpenBank.Infrastructure.Services.Interface;
 
-public interface IEmailSender
+public interface IEmailService
 {
     Task SendEmailAsync(EmailBase mailRequest);
 }

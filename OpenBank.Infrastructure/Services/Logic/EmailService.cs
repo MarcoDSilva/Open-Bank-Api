@@ -6,7 +6,7 @@ using OpenBank.Infrastructure.Entities.Models;
 
 namespace OpenBank.Infrastructure.Services.Logic;
 
-public class EmailSender : IEmailSender
+public class EmailService : IEmailService
 {
     public async Task SendEmailAsync(EmailBase mailRequest)
     {
