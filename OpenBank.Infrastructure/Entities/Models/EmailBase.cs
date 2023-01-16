@@ -1,6 +1,4 @@
-using Org.BouncyCastle.Asn1.Crmf;
-
-namespace OpenBank.Infrastructure.Email.Model;
+namespace OpenBank.Infrastructure.Entities.Models;
 
 public class EmailBase
 {

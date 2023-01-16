@@ -1,10 +1,10 @@
 
-using OpenBank.Infrastructure.Email.Model;
-using OpenBank.Infrastructure.Email.Service.Interface;
+using OpenBank.Infrastructure.Services.Interface;
 using MimeKit;
 using MailKit.Net.Smtp;
+using OpenBank.Infrastructure.Entities.Models;
 
-namespace OpenBank.Infrastructure.Email.Service.Logic;
+namespace OpenBank.Infrastructure.Services.Logic;
 
 public class EmailSender : IEmailSender
 {

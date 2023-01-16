@@ -1,4 +1,4 @@
-namespace OpenBank.API.Application.DTO;
+namespace OpenBank.Infrastructure.Entities.DTO;
 
 public class TransferCommunication
 {
