@@ -23,7 +23,7 @@ public class CommunicationService : ICommunicationService
     {
         if (communication is null) return;
 
-        if (communication?.toUser.email.Equals(communication?.fromUser.email) == true)
+        if (communication?.toUser.Id == communication?.fromUser.Id)
         {
             await SendSameOwnerEmail(communication);
         }
@@ -51,7 +51,7 @@ public class CommunicationService : ICommunicationService
 
         var userEmail = subject.Equals(TransferSent) ? communication?.fromUser.email : communication?.toUser.email;
 
-        var email = CreateEmail(userEmail, TransferSent, message);
+        var email = CreateEmail(userEmail, subject, message);
         await _emailService.SendEmailAsync(email);
     }
 
