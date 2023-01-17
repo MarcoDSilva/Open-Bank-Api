@@ -14,16 +14,16 @@ namespace OpenBank.API.Controllers;
 [Authorize]
 public class AccountsController : ControllerBase
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IAccountService _accountBusiness;
-    private readonly ITransferService _transferBusiness;
+    private readonly IAccountService _accountServices;
+    private readonly ITransferService _transferServices;
+    private readonly ITokenService _tokenServices;
     private readonly IMapper _mapper;
 
-    public AccountsController(IUnitOfWork unitOfWork, IAccountService accountBusinessRules, ITransferService transferBusinessRules, IMapper mapper)
+    public AccountsController(IAccountService accountServices, ITransferService transferServices, IMapper mapper, ITokenService tokenServices)
     {
-        _unitOfWork = unitOfWork;
-        _accountBusiness = accountBusinessRules;
-        _transferBusiness = transferBusinessRules;
+        _accountServices = accountServices;
+        _transferServices = transferServices;
+        _tokenServices = tokenServices;
         _mapper = mapper;
     }
 
@@ -35,7 +35,7 @@ public class AccountsController : ControllerBase
     public async Task<IActionResult> Accounts(CreateAccountRequest accountRequest)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdByToken(authToken);
 
         // validar campos vazios
         if (userId <= 0)
@@ -43,13 +43,13 @@ public class AccountsController : ControllerBase
 
         try
         {
-            var result = await _accountBusiness.CreateAccount(userId, accountRequest);
+            var result = await _accountServices.CreateAccount(userId, accountRequest);
 
             return (result is null) ? Problem() : Ok(result);
         }
         catch (Exception e)
         {
-            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Accounts with the message: {e.Message}");
+           // _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Accounts with the message: {e.Message}");
             return Problem(e.Message);
         }
     }
@@ -65,14 +65,14 @@ public class AccountsController : ControllerBase
     public async Task<IActionResult> Accounts()
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdByToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);
 
         try
         {
-            var accounts = await _accountBusiness.GetAccounts(userId);
+            var accounts = await _accountServices.GetAccounts(userId);
 
             if (accounts == null || accounts.Count == 0)
                 return NotFound("This user has no accounts.");
@@ -81,7 +81,7 @@ public class AccountsController : ControllerBase
         }
         catch (Exception e)
         {
-            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Accounts with the message: {e.Message}");
+            //_unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Accounts with the message: {e.Message}");
             return Problem(e.Message);
         }
     }
@@ -100,7 +100,7 @@ public class AccountsController : ControllerBase
     public async Task<IActionResult> Accounts([FromRoute] int id)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdByToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);
@@ -109,14 +109,14 @@ public class AccountsController : ControllerBase
         if (id <= 0)
             return BadRequest("Account id must be higher than 0");
 
-        Account? account = await _accountBusiness.GetAccountById(id, userId);
+        Account? account = await _accountServices.GetAccountById(id, userId);
 
         if (account is null)
             return NotFound(AccountDescriptions.AccountNonExistant);
 
         try
         {
-            var movements = await _transferBusiness.GetAccountMovementsAsync(account.Id);
+            var movements = await _transferServices.GetAccountMovementsAsync(account.Id);
 
             var accountWithMovements = new AccountMovement()
             {
@@ -128,12 +128,12 @@ public class AccountsController : ControllerBase
         }
         catch (ForbiddenAccountAccessException ex)
         {
-            _unitOfWork.loggerHandler.Log(LogLevel.Information, $"Forbidden user: {ex.Message}");
+            //_unitOfWork.loggerHandler.Log(LogLevel.Information, $"Forbidden user: {ex.Message}");
             return Forbid("Bearer");
         }
         catch (Exception e)
         {
-            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Accounts with the message: {e.Message}");
+           // _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Accounts with the message: {e.Message}");
             return Problem(e.Message);
         }
     }

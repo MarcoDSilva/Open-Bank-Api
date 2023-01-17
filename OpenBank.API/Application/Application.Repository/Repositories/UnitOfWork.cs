@@ -9,7 +9,7 @@ public class UnitOfWork : IUnitOfWork
     public ITransferRepository transferRepository { get; }
     public IDocumentRepository documentRepository { get; }
 
-    public ITokenService tokenHandler { get; }
+    public ITokenRepository tokenRepository { get; }
     public ILogger<Object> loggerHandler { get; }
 
     public UnitOfWork(
@@ -17,14 +17,14 @@ public class UnitOfWork : IUnitOfWork
         IAccountRepository accountRepository,
         ITransferRepository transferRepository,
         IDocumentRepository documentRepository,
-        ITokenService tokenHandler,
+        ITokenRepository tokenRepository,
         ILogger<Object> loggerHandler
         )
     {
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.transferRepository = transferRepository;
-        this.tokenHandler = tokenHandler;
+        this.tokenRepository = tokenRepository;
         this.loggerHandler = loggerHandler;
         this.documentRepository = documentRepository;
     }

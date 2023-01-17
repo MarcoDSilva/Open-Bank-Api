@@ -72,7 +72,7 @@ public class TokenService : ITokenService
         }
     }
 
-    public JwtSecurityToken GenerateNewToken(List<Claim> claims, DateTime expirationDate, SigningCredentials credentials)
+    private JwtSecurityToken GenerateNewToken(List<Claim> claims, DateTime expirationDate, SigningCredentials credentials)
     {
         return new JwtSecurityToken(
                    _configuration["Jwt:Issuer"],
@@ -91,6 +91,6 @@ public class TokenService : ITokenService
 
     public void RenewToken(string tokenWithBearer)
     {
-       
+
     }
 }

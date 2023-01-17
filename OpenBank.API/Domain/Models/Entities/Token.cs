@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using OpenBank.API.Domain.Models.Common;
 
 namespace OpenBank.API.Domain.Models.Entities;
 
-public class Token
+public class Token : BaseEntity
 {
     [Required]
     public string RefreshToken { get; set; }

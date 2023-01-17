@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Services.Interfaces;
-using OpenBank.API.Domain.Models.Entities;
 using AutoMapper;
 
 namespace OpenBank.API.Controllers;
@@ -11,21 +9,19 @@ namespace OpenBank.API.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IUserService _userBusinessRules;
+    private readonly IUserService _userServices;
     private readonly IMapper _mapper;
 
-    public UsersController(IUnitOfWork unitOfWork, IUserService userBusinessRules, IMapper mapper)
+    public UsersController(IUserService userServices, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
-        _userBusinessRules = userBusinessRules;
+        _userServices = userServices;
         _mapper = mapper;
     }
 
     [HttpGet]
     public IActionResult Users()
     {
-        var users = _userBusinessRules.GetAllUsers();
+        var users = _userServices.GetAllUsers();
 
         if ((int)users.Count() <= 0)
             return Ok("There are no users registered");
@@ -40,19 +36,19 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Users(CreateUserRequest createUser)
     {
-        var isUsernameAvailable = await _userBusinessRules.IsUsernameAvailableAsync(createUser.Username);
+        var isUsernameAvailable = await _userServices.IsUsernameAvailableAsync(createUser.Username);
 
         if (!isUsernameAvailable)
             return BadRequest($"Username {createUser.Username} already in use, please register with a different username.");
 
         try
         {
-            var result = await _userBusinessRules.CreateUserAsync(createUser);
+            var result = await _userServices.CreateUserAsync(createUser);
             return Ok(result);
         }
         catch (Exception e)
         {
-            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Error caught on control Users with the message: {e.Message}");
+            //_unitOfWork.loggerHandler.Log(LogLevel.Error, $"Error caught on control Users with the message: {e.Message}");
             return Problem(e.Message);
         }
     }

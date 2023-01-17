@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Services.Interfaces;
-using OpenBank.Api.Shared;
 
 namespace OpenBank.API.Controllers;
 
@@ -10,13 +9,13 @@ namespace OpenBank.API.Controllers;
 [Route("api/")]
 public class LoginController : ControllerBase
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IUserService _userBusinessRules;
+    private readonly IUserService _userServices;
+    private readonly ITokenService _tokenServices;
 
-    public LoginController(IUnitOfWork unitOfWork, IUserService userBusinessRules)
+    public LoginController(IUserService userServices, ITokenService tokenServices)
     {
-        _unitOfWork = unitOfWork;
-        _userBusinessRules = userBusinessRules;
+        _userServices = userServices;
+        _tokenServices = tokenServices;
     }
 
     [HttpPost("users/login")]
@@ -34,12 +33,12 @@ public class LoginController : ControllerBase
 
         try
         {
-            int userId = await _userBusinessRules.GetUserIdAsync(loginRequest.UserName, loginRequest.Password);
+            int userId = await _userServices.GetUserIdAsync(loginRequest.UserName, loginRequest.Password);
 
             if (userId > 0)
             {
                 // creating token
-                LoginUserResponse loginUserResponse = await _unitOfWork.tokenHandler.CreateTokenAsync(loginRequest, userId);
+                LoginUserResponse loginUserResponse = await _tokenServices.CreateTokenAsync(loginRequest, userId);
 
                 if (string.IsNullOrWhiteSpace(loginUserResponse?.AcessToken))
                     return Problem("Could not login due to issues with the server");
@@ -51,7 +50,7 @@ public class LoginController : ControllerBase
         }
         catch (Exception e)
         {
-            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Login with the message: {e.Message}");
+            //_unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Login with the message: {e.Message}");
             return Problem(e.Message);
         }
     }
@@ -64,12 +63,12 @@ public class LoginController : ControllerBase
     public async Task<IActionResult> Logout()
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-
-
-        // int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+        // int userId = _tokenServices.GetUserIdByToken(authToken);
 
         // if (userId <= 0)
         //     return Unauthorized(AccountDescriptions.NotLoggedIn);
+
+        // RevokeLogin
 
         return Ok();
     }
@@ -82,7 +81,7 @@ public class LoginController : ControllerBase
     public async Task<IActionResult> RenewToken()
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdByToken(authToken);
 
         // if (userId <= 0)
         //     return Unauthorized(AccountDescriptions.NotLoggedIn);

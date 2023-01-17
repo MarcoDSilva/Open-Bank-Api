@@ -12,16 +12,15 @@ namespace OpenBank.API.Controllers;
 [Authorize]
 public class TransfersController : ControllerBase
 {
+    private readonly ITransferService _transferServices;
+    private readonly IAccountService _accountServices;
+    private readonly ITokenService _tokenServices;
 
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ITransferService _transferBusiness;
-    private readonly IAccountService _accountBusiness;
-
-    public TransfersController(IUnitOfWork unitOfWork, ITransferService transferBusiness, IAccountService accountBusiness)
+    public TransfersController(ITransferService transferServices, IAccountService accountServices, ITokenService tokenServices)
     {
-        _unitOfWork = unitOfWork;
-        _transferBusiness = transferBusiness;
-        _accountBusiness = accountBusiness;
+        _transferServices = transferServices;
+        _accountServices = accountServices;
+        _tokenServices = tokenServices;
     }
 
     [HttpPost]
@@ -32,20 +31,20 @@ public class TransfersController : ControllerBase
     public async Task<IActionResult> Transfers(TransferRequest transferRequest)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdByToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);
 
         try
-        {   
-            var result = await _transferBusiness.TransferRequestAsync(transferRequest, userId);
+        {
+            var result = await _transferServices.TransferRequestAsync(transferRequest, userId);
             return Ok(result);
 
         }
         catch (Exception e)
         {
-            _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Transfers with the message: {e.Message}");
+            // _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Transfers with the message: {e.Message}");
 
             switch (e)
             {

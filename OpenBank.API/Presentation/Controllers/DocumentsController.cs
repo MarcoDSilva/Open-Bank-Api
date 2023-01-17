@@ -14,17 +14,18 @@ namespace OpenBank.API.Controllers;
 [Authorize]
 public class DocumentsController : Controller
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly IDocumentService _documentBusiness;
-    private readonly IAccountService _accountBusiness;
+    private readonly IDocumentService _documentServices;
+    private readonly IAccountService _accountServices;
+    private readonly ITokenService _tokenServices;
 
-    public DocumentsController(IUnitOfWork unitOfWork, IDocumentService documentBusinessRules, IMapper mapper, IAccountService accountRules)
+    public DocumentsController(IDocumentService documentServices, IMapper mapper,
+        IAccountService accountServices, ITokenService tokenServices)
     {
-        _unitOfWork = unitOfWork;
-        _documentBusiness = documentBusinessRules;
+        _documentServices = documentServices;
         _mapper = mapper;
-        _accountBusiness = accountRules;
+        _accountServices = accountServices;
+        _tokenServices = tokenServices;
     }
 
     [HttpPost("accounts/{accountId}/documents")]
@@ -35,12 +36,12 @@ public class DocumentsController : Controller
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
 
-        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdByToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);
 
-        Account? account = await _accountBusiness.GetAccountById(accountId, userId);
+        Account? account = await _accountServices.GetAccountById(accountId, userId);
 
         if (account is null)
             return NotFound(AccountDescriptions.AccountNonExistant);
@@ -92,7 +93,7 @@ public class DocumentsController : Controller
                     SizeMB = uploadedFile.Length / Math.Pow(1024, 2)
                 };
 
-                var saved = await _documentBusiness.AddAsync(documentToInsert);
+                var saved = await _documentServices.AddAsync(documentToInsert);
 
                 if (saved?.Id > 0)
                     return Ok(_mapper.Map<Document, DocumentResponse>(saved));
@@ -113,12 +114,12 @@ public class DocumentsController : Controller
     public async Task<IActionResult> GetAccountDocuments([FromRoute] int accountId)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdByToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);
 
-        Account? account = await _accountBusiness.GetAccountById(accountId, userId);
+        Account? account = await _accountServices.GetAccountById(accountId, userId);
 
         if (account is null)
             return NotFound(AccountDescriptions.AccountNonExistant);
@@ -128,7 +129,7 @@ public class DocumentsController : Controller
 
         try
         {
-            List<Document> documents = await _documentBusiness.GetDocumentsAsync(accountId);
+            List<Document> documents = await _documentServices.GetDocumentsAsync(accountId);
 
             if (documents.Count <= 0)
                 return Ok(documents);
@@ -152,12 +153,12 @@ public class DocumentsController : Controller
     public async Task<IActionResult> GetDocument([FromRoute] int accountId, [FromRoute] int docId)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdByToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);
 
-        Account? account = await _accountBusiness.GetAccountById(accountId, userId);
+        Account? account = await _accountServices.GetAccountById(accountId, userId);
 
         if (account is null)
             return NotFound(AccountDescriptions.AccountNonExistant);
@@ -167,7 +168,7 @@ public class DocumentsController : Controller
 
         try
         {
-            Document? document = await _documentBusiness.GetDocumentAsync(docId);
+            Document? document = await _documentServices.GetDocumentAsync(docId);
 
             if (document is null)
                 return Ok("Document not found");
@@ -180,7 +181,7 @@ public class DocumentsController : Controller
             {
                 FileDownloadName = document.FileName
             };
-           
+
             //return Ok(documentDTO);
         }
         catch (Exception e)
