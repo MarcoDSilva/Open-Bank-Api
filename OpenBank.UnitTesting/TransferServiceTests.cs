@@ -22,6 +22,8 @@ public class TransferServiceTests
     private Account _From_account;
     private Account _To_account;
 
+    private User _user;
+
     public TransferServiceTests()
     {
         _unitOfWork = new Mock<IUnitOfWork>();
@@ -45,8 +47,21 @@ public class TransferServiceTests
         _From_account = SetAccount(1);
         _To_account = SetAccount(2);
 
+        _user = new User()
+        {
+            Id = 1,
+            Created_at = DateTime.UtcNow,
+            Email = "",
+            FullName = "",
+            Password = "",
+            UserName = ""
+        };
+
         _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_From_account.Id)).ReturnsAsync(_From_account);
         _unitOfWork.Setup(acc => acc.accountRepository.GetByIdAsync(_To_account.Id)).ReturnsAsync(_To_account);
+
+        _unitOfWork.Setup(u => u.userRepository.GetUserByAccountId(_From_account.Id)).Returns(Task.FromResult(_user));
+        _unitOfWork.Setup(u => u.userRepository.GetUserByAccountId(_To_account.Id)).Returns(Task.FromResult(_user));
 
         _unitOfWork.Setup(t => t.transferRepository.SaveAsync()).ReturnsAsync(true);
     }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Services.Interfaces;
+using OpenBank.Api.Shared;
 
 namespace OpenBank.API.Controllers;
 
@@ -53,5 +54,39 @@ public class LoginController : ControllerBase
             _unitOfWork.loggerHandler.Log(LogLevel.Error, $"Exception caught on controller Login with the message: {e.Message}");
             return Problem(e.Message);
         }
+    }
+
+    [HttpPost("users/logout")]
+    [ProducesResponseType(typeof(LoginUserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> Logout()
+    {
+        string authToken = HttpContext.Request.Headers["Authorization"].ToString();
+
+        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+
+        if (userId <= 0)
+            return Unauthorized(AccountDescriptions.NotLoggedIn);
+
+        return Ok();
+    }
+
+    [HttpPost("users/renew")]
+    [ProducesResponseType(typeof(LoginUserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> RenewToken()
+    {
+        string authToken = HttpContext.Request.Headers["Authorization"].ToString();
+
+        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+
+        if (userId <= 0)
+            return Unauthorized(AccountDescriptions.NotLoggedIn);
+
+        return Ok();
     }
 }
