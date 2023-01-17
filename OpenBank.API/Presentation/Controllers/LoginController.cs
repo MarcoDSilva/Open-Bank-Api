@@ -57,7 +57,7 @@ public class LoginController : ControllerBase
     }
 
     [HttpPost("users/logout")]
-    [ProducesResponseType(typeof(LoginUserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
@@ -65,10 +65,11 @@ public class LoginController : ControllerBase
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
 
-        int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
 
-        if (userId <= 0)
-            return Unauthorized(AccountDescriptions.NotLoggedIn);
+        // int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
+
+        // if (userId <= 0)
+        //     return Unauthorized(AccountDescriptions.NotLoggedIn);
 
         return Ok();
     }
@@ -81,11 +82,18 @@ public class LoginController : ControllerBase
     public async Task<IActionResult> RenewToken()
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-
         int userId = _unitOfWork.tokenHandler.GetUserIdByToken(authToken);
 
-        if (userId <= 0)
-            return Unauthorized(AccountDescriptions.NotLoggedIn);
+        // if (userId <= 0)
+        //     return Unauthorized(AccountDescriptions.NotLoggedIn);
+
+        // isRefreshTokenValid
+        //  generateNewToken()
+        //    return Ok(token)
+        // return BadRequest(InvalidToken Login again)
+
+
+
 
         return Ok();
     }

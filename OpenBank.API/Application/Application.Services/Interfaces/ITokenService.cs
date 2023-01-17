@@ -2,7 +2,7 @@ using OpenBank.API.Application.DTO;
 
 namespace OpenBank.API.Application.Repository.Interfaces;
 
-public interface ITokenHandler
+public interface ITokenService
 {
     Task<LoginUserResponse> CreateTokenAsync(LoginUserRequest loginRequest, int userId);
     int GetUserIdByToken(string token);

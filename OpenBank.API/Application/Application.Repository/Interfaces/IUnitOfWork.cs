@@ -6,6 +6,6 @@ public interface IUnitOfWork
     IAccountRepository accountRepository { get; }
     ITransferRepository transferRepository { get; }
     IDocumentRepository documentRepository { get; }
-    ITokenHandler tokenHandler { get; }
+    ITokenService tokenHandler { get; }
     ILogger<Object> loggerHandler {get; }
 }

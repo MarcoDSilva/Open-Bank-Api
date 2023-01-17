@@ -9,7 +9,7 @@ public class UnitOfWork : IUnitOfWork
     public ITransferRepository transferRepository { get; }
     public IDocumentRepository documentRepository { get; }
 
-    public ITokenHandler tokenHandler { get; }
+    public ITokenService tokenHandler { get; }
     public ILogger<Object> loggerHandler { get; }
 
     public UnitOfWork(
@@ -17,7 +17,7 @@ public class UnitOfWork : IUnitOfWork
         IAccountRepository accountRepository,
         ITransferRepository transferRepository,
         IDocumentRepository documentRepository,
-        ITokenHandler tokenHandler,
+        ITokenService tokenHandler,
         ILogger<Object> loggerHandler
         )
     {

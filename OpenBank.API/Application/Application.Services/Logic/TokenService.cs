@@ -4,17 +4,16 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using OpenBank.API.Application.DTO;
 using OpenBank.API.Application.Repository.Interfaces;
-using System.Security.Cryptography;
 
 namespace OpenBank.API.Application.Repository.Repositories;
 
-public class TokenHandler : ITokenHandler
+public class TokenService : ITokenService
 {
     private readonly IConfiguration _configuration;
     private const int ExpirationTime = 5;
     private const int RefreshExpirationTime = 60;
 
-    public TokenHandler(IConfiguration configuration)
+    public TokenService(IConfiguration configuration)
     {
         _configuration = configuration;
     }
@@ -29,24 +28,16 @@ public class TokenHandler : ITokenHandler
             new ("userId", userId.ToString()),
             new (ClaimTypes.Expiration, expirationDate.ToString()),
             new (ClaimTypes.NameIdentifier, loginUserRequest.UserName),
-            new (ClaimTypes.Expiration, expirationDate.ToString()),
+            new (ClaimTypes.Expiration, expirationDate.ToString())
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var refreshToken = GenerateRefreshToken();
+        var refreshToken = Guid.NewGuid().ToString();
         claims.Add(new("refreshToken", refreshToken));
 
-        var token = new JwtSecurityToken(
-            _configuration["Jwt:Issuer"],
-            _configuration["Jwt:Audience"],
-            claims,
-            expires: expirationDate,
-            signingCredentials: credentials,
-            refreshToken: refreshToken
-        );
-
+        var token = GenerateNewToken(claims, expirationDate, credentials);
         string generatedToken = new JwtSecurityTokenHandler().WriteToken(token);
 
         var response = new LoginUserResponse()
@@ -81,18 +72,25 @@ public class TokenHandler : ITokenHandler
         }
     }
 
-    private string GenerateRefreshToken()
+    public JwtSecurityToken GenerateNewToken(List<Claim> claims, DateTime expirationDate, SigningCredentials credentials)
     {
-        var randomNumber = new byte[32];
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
-        }
+        return new JwtSecurityToken(
+                   _configuration["Jwt:Issuer"],
+                   _configuration["Jwt:Audience"],
+                   claims,
+                   expires: expirationDate,
+                   signingCredentials: credentials
+               );
     }
 
-    // public Task<LoginUserResponse> RenewToken(string tokenWithBearer)
-    // {
-    //     return Task<LoginUserResponse>;
-    // }
+
+    public bool RevokeToken()
+    {
+        return false;
+    }
+
+    public void RenewToken(string tokenWithBearer)
+    {
+       
+    }
 }

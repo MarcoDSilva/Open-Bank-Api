@@ -1,3 +1,4 @@
+using Microsoft.IdentityModel.Tokens;
 using OpenBank.API.Application.Repository.Interfaces;
 using OpenBank.API.Application.Repository.Repositories;
 
@@ -11,7 +12,7 @@ public static class RepositoriesRegistration
             .AddScoped<IAccountRepository, AccountRepository>()
             .AddScoped<ITransferRepository, TransferRepository>()
             .AddScoped<IDocumentRepository, DocumentRepository>()
-            .AddScoped<ITokenHandler, TokenHandler>();
+            .AddScoped<ITokenRepository, TokenRepository>();
 
         return services;
     }
