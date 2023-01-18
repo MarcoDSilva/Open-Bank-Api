@@ -23,19 +23,21 @@ public class TokenService : ITokenService
         DateTime expirationDate = DateTime.UtcNow.AddMinutes(ExpirationTime);
         DateTime refreshExpirationDate = DateTime.UtcNow.AddMinutes(RefreshExpirationTime);
 
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var refreshToken = Guid.NewGuid().ToString();
+        var Jti = Guid.NewGuid().ToString();
+
         var claims = new List<Claim>()
         {
             new ("userId", userId.ToString()),
             new (ClaimTypes.Expiration, expirationDate.ToString()),
             new (ClaimTypes.NameIdentifier, loginUserRequest.UserName),
-            new (ClaimTypes.Expiration, expirationDate.ToString())
+            new (ClaimTypes.Expiration, expirationDate.ToString()),
+            new("refreshToken", refreshToken),
+            new("jti", Jti)
         };
-
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var refreshToken = Guid.NewGuid().ToString();
-        claims.Add(new("refreshToken", refreshToken));
 
         var token = GenerateNewToken(claims, expirationDate, credentials);
         string generatedToken = new JwtSecurityTokenHandler().WriteToken(token);
@@ -84,13 +86,13 @@ public class TokenService : ITokenService
     }
 
 
-    public bool RevokeToken()
+    public bool RevokeToken(string tokenWithBearer)
     {
         return false;
     }
 
     public void RenewToken(string tokenWithBearer)
     {
-
+        return;
     }
 }

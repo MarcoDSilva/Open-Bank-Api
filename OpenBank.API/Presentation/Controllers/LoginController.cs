@@ -68,7 +68,8 @@ public class LoginController : ControllerBase
         // if (userId <= 0)
         //     return Unauthorized(AccountDescriptions.NotLoggedIn);
 
-        // RevokeLogin
+        // RevokeToken
+        //
 
         return Ok();
     }
