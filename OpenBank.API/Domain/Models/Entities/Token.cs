@@ -16,7 +16,6 @@ public class Token : BaseEntity
 
     public DateTime? UsedDate { get; set; }
 
-    [Required]
     [ForeignKey("Users")]
     public int UserId { get; set; }
 }

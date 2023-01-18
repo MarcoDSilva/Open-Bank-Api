@@ -92,9 +92,6 @@ public class LoginController : ControllerBase
         //    return Ok(token)
         // return BadRequest(InvalidToken Login again)
 
-
-
-
         return Ok();
     }
 }

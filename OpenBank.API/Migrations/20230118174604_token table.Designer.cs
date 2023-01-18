@@ -12,8 +12,8 @@ using OpenBank.Api.Data;
 namespace OpenBank.API.Migrations
 {
     [DbContext(typeof(OpenBankApiDbContext))]
-    [Migration("20230105170957_schema with document table")]
-    partial class schemawithdocumenttable
+    [Migration("20230118174604_token table")]
+    partial class tokentable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,8 +74,8 @@ namespace OpenBank.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("SizeMB")
-                        .HasColumnType("integer");
+                    b.Property<double>("SizeMB")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -84,6 +84,39 @@ namespace OpenBank.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Documents");
+                });
+
+            modelBuilder.Entity("OpenBank.API.Domain.Models.Entities.Token", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpirationTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Jti")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UsedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tokens");
                 });
 
             modelBuilder.Entity("OpenBank.API.Domain.Models.Entities.Transfer", b =>
