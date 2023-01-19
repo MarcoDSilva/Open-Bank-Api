@@ -4,8 +4,8 @@ namespace OpenBank.API.Application.Repository.Interfaces;
 
 public interface ITokenService
 {
-    Task<LoginUserResponse> CreateTokenAsync(LoginUserRequest loginRequest, int userId);
+    Task<LoginUserResponse> CreateTokenAsync(LoginUserRequest loginRequest, string userId);
     int GetUserIdByToken(string token);
     bool RevokeToken(string token);
-    void RenewToken(string token);
+    Task<LoginUserResponse> RenewTokenAsync(string token);
 }

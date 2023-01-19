@@ -38,7 +38,7 @@ public class LoginController : ControllerBase
             if (userId > 0)
             {
                 // creating token
-                LoginUserResponse loginUserResponse = await _tokenServices.CreateTokenAsync(loginRequest, userId);
+                LoginUserResponse loginUserResponse = await _tokenServices.CreateTokenAsync(loginRequest, userId.ToString());
 
                 if (string.IsNullOrWhiteSpace(loginUserResponse?.AcessToken))
                     return Problem("Could not login due to issues with the server");
@@ -82,16 +82,25 @@ public class LoginController : ControllerBase
     public async Task<IActionResult> RenewToken()
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _tokenServices.GetUserIdByToken(authToken);
 
-        // if (userId <= 0)
-        //     return Unauthorized(AccountDescriptions.NotLoggedIn);
+        try
+        {
+            var refreshedToken = await _tokenServices.RenewTokenAsync(authToken);
 
-        // isRefreshTokenValid
-        //  generateNewToken()
-        //    return Ok(token)
-        // return BadRequest(InvalidToken Login again)
+            if (refreshedToken is null)
+                return BadRequest();
 
-        return Ok();
+            return Ok(refreshedToken);
+        }
+        catch (Exception e)
+        {
+            switch (e)
+            {
+                case InvalidTokenException:
+                    return Forbid(e.Message);
+                default:
+                    return Problem(e.Message);
+            }
+        }
     }
 }

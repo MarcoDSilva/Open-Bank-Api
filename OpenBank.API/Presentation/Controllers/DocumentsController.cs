@@ -43,7 +43,7 @@ public class DocumentsController : Controller
 
         Account? account = await _accountServices.GetAccountById(accountId, userId);
 
-        if (account is null)
+        if (account is null) 
             return NotFound(AccountDescriptions.AccountNonExistant);
 
         if (account.UserId != userId)
@@ -160,7 +160,7 @@ public class DocumentsController : Controller
 
         Account? account = await _accountServices.GetAccountById(accountId, userId);
 
-        if (account is null)
+        if (account is null) 
             return NotFound(AccountDescriptions.AccountNonExistant);
 
         if (account.UserId != userId)
@@ -181,8 +181,6 @@ public class DocumentsController : Controller
             {
                 FileDownloadName = document.FileName
             };
-
-            //return Ok(documentDTO);
         }
         catch (Exception e)
         {
