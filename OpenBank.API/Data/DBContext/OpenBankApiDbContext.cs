@@ -14,5 +14,5 @@ public class OpenBankApiDbContext : DbContext
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Transfer> Transfers { get; set; }
     public DbSet<Document> Documents { get; set; }
-    public DbSet<Token> Tokens { get; set; }
+    public DbSet<RefreshToken> Tokens { get; set; }
 }

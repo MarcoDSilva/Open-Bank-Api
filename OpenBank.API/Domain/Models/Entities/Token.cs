@@ -4,10 +4,10 @@ using OpenBank.API.Domain.Models.Common;
 
 namespace OpenBank.API.Domain.Models.Entities;
 
-public class Token : BaseEntity
+public class RefreshToken : BaseEntity
 {
     [Required]
-    public string RefreshToken { get; set; }
+    public string Token { get; set; }
     [Required]
     public string Jti { get; set; }
 

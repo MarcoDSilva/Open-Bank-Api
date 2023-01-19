@@ -96,7 +96,10 @@ public class LoginController : ControllerBase
         {
             switch (e)
             {
-                case InvalidTokenException:
+                case ExpiredTokenException:
+                    return BadRequest(e.Message);
+                case InvalidUserAccessException:
+                case IllegalTokenException:
                     return Forbid(e.Message);
                 default:
                     return Problem(e.Message);

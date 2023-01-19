@@ -27,18 +27,22 @@ public class TokenService : ITokenService
         var claims = CreateClaims(data);
         var accessToken = CreateToken(claims, DateTimeOffset.Parse(data["expirationDate"]).UtcDateTime);
 
-        var registerToken = new Token()
+        var registerToken = new RefreshToken()
         {
             Created_at = DateTime.UtcNow,
             ExpirationTime = DateTimeOffset.Parse(data["expirationDate"]).UtcDateTime,
             Jti = data["jti"],
-            RefreshToken = data["refreshToken"],
+            Token = data["refreshToken"],
             UsedDate = null,
             UserId = int.Parse(userId)
         };
 
         var savedToken = await _unitOfWork.tokenRepository.AddTokenAsync(registerToken);
-        if (savedToken?.Id <= 0) throw new Exception("Could not create token permission");
+
+        if (savedToken != registerToken) throw new Exception("Could not create token permission");
+
+        bool isSaved = await _unitOfWork.tokenRepository.SaveAsync();
+        if (!isSaved) throw new Exception("Could not create token permission");
 
         var response = new LoginUserResponse()
         {
@@ -80,7 +84,7 @@ public class TokenService : ITokenService
 
     public async Task<LoginUserResponse> RenewTokenAsync(string tokenWithBearer)
     {
-        if (string.IsNullOrWhiteSpace(tokenWithBearer)) throw new InvalidTokenException();
+        if (string.IsNullOrWhiteSpace(tokenWithBearer)) throw new IllegalTokenException();
 
         string token = tokenWithBearer.Replace("Bearer ", "");
         var claims = new JwtSecurityToken(token).Claims;
@@ -92,26 +96,40 @@ public class TokenService : ITokenService
         string jtiClaim = claims.First(c => c.Type == "jti").Value;
         string username = claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-        if (string.IsNullOrEmpty(userId) || int.Parse(userId) <= 0) throw new InvalidTokenException();
-        if (string.IsNullOrEmpty(refreshTokenClaim) || string.IsNullOrEmpty(jtiClaim)) throw new InvalidTokenException();
+        if (string.IsNullOrEmpty(userId) || int.Parse(userId) <= 0) throw new InvalidUserAccessException("User not found.");
+        if (string.IsNullOrEmpty(refreshTokenClaim) || string.IsNullOrEmpty(jtiClaim)) throw new IllegalTokenException("Tokens not found.");
         if (string.IsNullOrEmpty(refreshExpirationClaim) || DateTimeOffset.Parse(refreshExpirationClaim).UtcDateTime <= DateTime.UtcNow)
-            throw new InvalidTokenException();
+            throw new ExpiredTokenException("Expired token.");
 
-        // validate refresh token on db with jti and validation
         var refreshToken = await _unitOfWork.tokenRepository.GetTokenAsync(refreshTokenClaim, jtiClaim);
-        if (refreshToken is null || refreshToken.UserId.ToString() != userId) throw new InvalidTokenException();
+        if (refreshToken is null || refreshToken.UserId.ToString() != userId) throw new InvalidUserAccessException("Invalid Token");
 
         bool isRefreshTokenValid = refreshToken.ExpirationTime >= DateTime.UtcNow && refreshToken.UsedDate == null;
+        if (!isRefreshTokenValid) throw new ExpiredTokenException("Expired token.");
 
-        if (!isRefreshTokenValid) throw new InvalidTokenException();
+        // update o refreshtoken original para marcar como usado
+        refreshToken.UsedDate = DateTime.UtcNow;
+
+        var updatedToken = _unitOfWork.tokenRepository.UpdateToken(refreshToken);
+        if (updatedToken != refreshToken) throw new Exception("Could not update token");
 
         var claimData = DataForClaims(userId, username);
         var newClaims = CreateClaims(claimData);
-
         var accessToken = CreateToken(newClaims, DateTimeOffset.Parse(claimData["expirationDate"]).UtcDateTime);
 
-        // update o refreshtoken original para marcar como usado
-        // inserir novo registo na bd
+        var newTokenInsertion = _unitOfWork.tokenRepository.AddTokenAsync(new RefreshToken()
+        {
+            Created_at = DateTime.UtcNow,
+            ExpirationTime = DateTimeOffset.Parse(claimData["refreshExpirationDate"]).UtcDateTime,
+            Token = claimData["refreshToken"],
+            Jti = claimData["jti"],
+            UsedDate = null,
+            UserId = int.Parse(userId)
+        });
+
+        bool isSaved = await _unitOfWork.tokenRepository.SaveAsync();
+        if (!isSaved) throw new Exception("Could not save the token");
+
         var response = new LoginUserResponse()
         {
             AcessToken = accessToken,

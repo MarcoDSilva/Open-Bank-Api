@@ -14,16 +14,16 @@ public class TokenRepository : ITokenRepository
         _openBankApiDbContext = openBankApiDbContext;
     }
 
-    public async Task<Token?> AddTokenAsync(Token token)
+    public async Task<RefreshToken?> AddTokenAsync(RefreshToken token)
     {
         var saved = await _openBankApiDbContext.AddAsync(token);
         return saved.Entity;
     }
 
-    public async Task<Token> GetTokenAsync(string refreshToken, string jti)
+    public async Task<RefreshToken> GetTokenAsync(string refreshToken, string jti)
     {
         var tokenList = await _openBankApiDbContext.Tokens.ToListAsync();
-        var token = tokenList.FirstOrDefault(t => t.RefreshToken.Equals(refreshToken) && t.Jti.Equals(jti));
+        var token = tokenList.FirstOrDefault(t => t.Token.Equals(refreshToken) && t.Jti.Equals(jti));
 
         return token;
     }
@@ -34,7 +34,7 @@ public class TokenRepository : ITokenRepository
         return result > 0;
     }
 
-    public Token? UpdateToken(Token token)
+    public RefreshToken? UpdateToken(RefreshToken token)
     {
         var updated = _openBankApiDbContext.Tokens.Update(token);
         return updated.Entity;

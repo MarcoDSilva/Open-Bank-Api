@@ -4,8 +4,8 @@ namespace OpenBank.API.Application.Repository.Interfaces;
 
 public interface ITokenRepository
 {
-    Task<Token?> AddTokenAsync(Token token);
-    Task<Token> GetTokenAsync(string token, string jti);
-    Token? UpdateToken(Token token);
+    Task<RefreshToken?> AddTokenAsync(RefreshToken token);
+    Task<RefreshToken> GetTokenAsync(string token, string jti);
+    RefreshToken? UpdateToken(RefreshToken token);
     Task<bool> SaveAsync();
 }
