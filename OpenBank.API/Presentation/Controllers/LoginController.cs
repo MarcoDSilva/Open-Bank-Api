@@ -63,15 +63,12 @@ public class LoginController : ControllerBase
     public async Task<IActionResult> Logout()
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        // int userId = _tokenServices.GetUserIdByToken(authToken);
 
-        // if (userId <= 0)
-        //     return Unauthorized(AccountDescriptions.NotLoggedIn);
+        if (string.IsNullOrWhiteSpace(authToken)) return BadRequest("Non existent token.");
 
-        // RevokeToken
-        //
-
-        return Ok();
+        bool isRevoked = await _tokenServices.RevokeToken(authToken);
+        // invalidate local session when frontend is added here
+        return isRevoked ? Ok() : Problem();
     }
 
     [HttpPost("users/renew")]
@@ -82,6 +79,8 @@ public class LoginController : ControllerBase
     public async Task<IActionResult> RenewToken()
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
+
+        if (string.IsNullOrEmpty(authToken)) return BadRequest("Non existant token");
 
         try
         {

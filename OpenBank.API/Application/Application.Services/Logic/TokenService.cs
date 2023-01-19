@@ -23,7 +23,7 @@ public class TokenService : ITokenService
 
     public async Task<LoginUserResponse> CreateTokenAsync(LoginUserRequest loginUserRequest, string userId)
     {
-        var data = DataForClaims(userId, loginUserRequest.UserName);
+        var data = CreateDataForClaims(userId, loginUserRequest.UserName);
         var claims = CreateClaims(data);
         var accessToken = CreateToken(claims, DateTimeOffset.Parse(data["expirationDate"]).UtcDateTime);
 
@@ -56,15 +56,13 @@ public class TokenService : ITokenService
         return response;
     }
 
-    public int GetUserIdByToken(string tokenWithBearer)
+    public int GetUserIdFromToken(string tokenWithBearer)
     {
         if (string.IsNullOrWhiteSpace(tokenWithBearer)) return 0; // validations against a possible empty header token
 
         try
         {
-            string tokenWithoutBearer = tokenWithBearer.Replace("Bearer ", "");
-            var claims = new JwtSecurityToken(tokenWithoutBearer).Claims;
-
+            var claims = GetClaims(tokenWithBearer);
             string user = claims.First(c => c.Type == "userId").Value;
 
             return int.Parse(user);
@@ -77,43 +75,50 @@ public class TokenService : ITokenService
     }
 
 
-    public bool RevokeToken(string tokenWithBearer)
+    public async Task<bool> RevokeToken(string tokenWithBearer)
     {
-        return false;
+        var claims = GetClaims(tokenWithBearer);
+        var claimsValues = GetClaimValues(claims);
+
+        var refreshToken = await _unitOfWork.tokenRepository.GetTokenAsync(claimsValues["refreshTokenClaim"], claimsValues["jti"]);
+
+        if (refreshToken is null || refreshToken.UserId.ToString() != claimsValues["userId"])
+            throw new InvalidUserAccessException("Invalid Token");
+
+        refreshToken.UsedDate = DateTime.UtcNow;
+
+        var updatedToken = _unitOfWork.tokenRepository.UpdateToken(refreshToken);
+        bool isSaved = await _unitOfWork.tokenRepository.SaveAsync();
+
+        return isSaved;
     }
 
     public async Task<LoginUserResponse> RenewTokenAsync(string tokenWithBearer)
     {
-        if (string.IsNullOrWhiteSpace(tokenWithBearer)) throw new IllegalTokenException();
+        var claims = GetClaims(tokenWithBearer);
+        var claimsValues = GetClaimValues(claims);
 
-        string token = tokenWithBearer.Replace("Bearer ", "");
-        var claims = new JwtSecurityToken(token).Claims;
+        if (string.IsNullOrEmpty(claimsValues["userId"]) || int.Parse(claimsValues["userId"]) <= 0)
+            throw new InvalidUserAccessException("User not found.");
 
-        // get claim values
-        string userId = claims.First(c => c.Type == "userId").Value;
-        string refreshTokenClaim = claims.First(c => c.Type == "refreshToken").Value;
-        string refreshExpirationClaim = claims.First(c => c.Type == "refreshExpiration").Value;
-        string jtiClaim = claims.First(c => c.Type == "jti").Value;
-        string username = claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        if (string.IsNullOrEmpty(claimsValues["refreshTokenClaim"]) || string.IsNullOrEmpty(claimsValues["jti"]))
+            throw new IllegalTokenException("Tokens not found.");
 
-        if (string.IsNullOrEmpty(userId) || int.Parse(userId) <= 0) throw new InvalidUserAccessException("User not found.");
-        if (string.IsNullOrEmpty(refreshTokenClaim) || string.IsNullOrEmpty(jtiClaim)) throw new IllegalTokenException("Tokens not found.");
-        if (string.IsNullOrEmpty(refreshExpirationClaim) || DateTimeOffset.Parse(refreshExpirationClaim).UtcDateTime <= DateTime.UtcNow)
+        if (string.IsNullOrEmpty(claimsValues["refreshExpirationClaim"]) || DateTimeOffset.Parse(claimsValues["refreshExpirationClaim"]).UtcDateTime <= DateTime.UtcNow)
             throw new ExpiredTokenException("Expired token.");
 
-        var refreshToken = await _unitOfWork.tokenRepository.GetTokenAsync(refreshTokenClaim, jtiClaim);
-        if (refreshToken is null || refreshToken.UserId.ToString() != userId) throw new InvalidUserAccessException("Invalid Token");
+        var refreshToken = await _unitOfWork.tokenRepository.GetTokenAsync(claimsValues["refreshTokenClaim"], claimsValues["jti"]);
+        if (refreshToken is null || refreshToken.UserId.ToString() != claimsValues["userId"]) throw new InvalidUserAccessException("Invalid Token");
 
-        bool isRefreshTokenValid = refreshToken.ExpirationTime >= DateTime.UtcNow && refreshToken.UsedDate == null;
+        bool isRefreshTokenValid = refreshToken.ExpirationTime >= DateTime.UtcNow && refreshToken.UsedDate is null;
         if (!isRefreshTokenValid) throw new ExpiredTokenException("Expired token.");
 
         // update o refreshtoken original para marcar como usado
         refreshToken.UsedDate = DateTime.UtcNow;
-
         var updatedToken = _unitOfWork.tokenRepository.UpdateToken(refreshToken);
         if (updatedToken != refreshToken) throw new Exception("Could not update token");
 
-        var claimData = DataForClaims(userId, username);
+        var claimData = CreateDataForClaims(claimsValues["userId"], claimsValues["username"]);
         var newClaims = CreateClaims(claimData);
         var accessToken = CreateToken(newClaims, DateTimeOffset.Parse(claimData["expirationDate"]).UtcDateTime);
 
@@ -124,7 +129,7 @@ public class TokenService : ITokenService
             Token = claimData["refreshToken"],
             Jti = claimData["jti"],
             UsedDate = null,
-            UserId = int.Parse(userId)
+            UserId = int.Parse(claimsValues["userId"])
         });
 
         bool isSaved = await _unitOfWork.tokenRepository.SaveAsync();
@@ -140,6 +145,26 @@ public class TokenService : ITokenService
         };
 
         return response;
+    }
+
+    private Dictionary<string, string> GetClaimValues(IEnumerable<Claim> claims)
+    {
+        return new Dictionary<string, string>()
+        {
+            {"userId", claims.First(c => c.Type == "userId").Value },
+            {"refreshTokenClaim", claims.First(c => c.Type == "refreshToken").Value },
+            {"refreshExpirationClaim", claims.First(c => c.Type == "refreshExpiration").Value },
+            {"jti", claims.First(c => c.Type == "jti").Value },
+            {"username", claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value }
+        };
+    }
+
+    private IEnumerable<Claim> GetClaims(string tokenWithBearer)
+    {
+        string token = tokenWithBearer.Replace("Bearer ", "");
+        var claims = new JwtSecurityToken(token).Claims;
+
+        return claims;
     }
 
     private string CreateToken(List<Claim> claims, DateTime expirationDate)
@@ -172,7 +197,7 @@ public class TokenService : ITokenService
         };
     }
 
-    private Dictionary<string, string> DataForClaims(string userId, string username)
+    private Dictionary<string, string> CreateDataForClaims(string userId, string username)
     {
         return new Dictionary<string, string>()
         {

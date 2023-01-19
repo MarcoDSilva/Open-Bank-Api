@@ -35,7 +35,7 @@ public class AccountsController : ControllerBase
     public async Task<IActionResult> Accounts(CreateAccountRequest accountRequest)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _tokenServices.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdFromToken(authToken);
 
         // validar campos vazios
         if (userId <= 0)
@@ -65,7 +65,7 @@ public class AccountsController : ControllerBase
     public async Task<IActionResult> Accounts()
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _tokenServices.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdFromToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);
@@ -100,7 +100,7 @@ public class AccountsController : ControllerBase
     public async Task<IActionResult> Accounts([FromRoute] int id)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _tokenServices.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdFromToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);

@@ -31,7 +31,7 @@ public class TransfersController : ControllerBase
     public async Task<IActionResult> Transfers(TransferRequest transferRequest)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _tokenServices.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdFromToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);

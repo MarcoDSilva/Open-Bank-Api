@@ -36,7 +36,7 @@ public class DocumentsController : Controller
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
 
-        int userId = _tokenServices.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdFromToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);
@@ -114,7 +114,7 @@ public class DocumentsController : Controller
     public async Task<IActionResult> GetAccountDocuments([FromRoute] int accountId)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _tokenServices.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdFromToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);
@@ -153,7 +153,7 @@ public class DocumentsController : Controller
     public async Task<IActionResult> GetDocument([FromRoute] int accountId, [FromRoute] int docId)
     {
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
-        int userId = _tokenServices.GetUserIdByToken(authToken);
+        int userId = _tokenServices.GetUserIdFromToken(authToken);
 
         if (userId <= 0)
             return Unauthorized(AccountDescriptions.NotLoggedIn);
