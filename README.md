@@ -15,13 +15,18 @@ Clone the project
   git clone https://github.com/MarcoDSilva/Open-Bank-Api.git
 ```
 
+Run the docker composer (Sidenote: uncomment the postgresql lines and associate the ports with the ones from the connection string , or the ports you prefer)
+```bash
+  docker compose up
+```
+
 Go to the project directory
 
 ```bash
   cd Open-Bank-Api
 ```
 
-Create the database
+Create the database (if the postgresql container is not running this will fail)
 
 ```bash
   dotnet ef database update
