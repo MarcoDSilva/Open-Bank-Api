@@ -61,7 +61,7 @@ builder.Services.AddAuthentication(option =>
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,
+            ValidateLifetime = true, // this has to enable to validate the time, it's commented out to test the refresh without the dates
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],

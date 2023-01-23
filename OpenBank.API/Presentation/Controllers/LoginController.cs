@@ -84,7 +84,10 @@ public class LoginController : ControllerBase
 
         try
         {
-            var refreshedToken = await _tokenServices.RenewTokenAsync(authToken);
+            var validatedToken = await _tokenServices.ValidateToken(authToken);
+            validatedToken.UsedDate = DateTime.UtcNow;
+
+            var refreshedToken = await _tokenServices.RenewTokenAsync(validatedToken);
 
             if (refreshedToken is null)
                 return BadRequest();
