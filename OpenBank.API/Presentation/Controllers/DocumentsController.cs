@@ -38,27 +38,19 @@ public class DocumentsController : Controller
 
         int userId = _tokenServices.GetUserIdFromToken(authToken);
 
-        if (userId <= 0)
-            return Unauthorized(AccountDescriptions.NotLoggedIn);
+        if (userId <= 0) return Unauthorized(AccountDescriptions.NotLoggedIn);
 
         Account? account = await _accountServices.GetAccountById(accountId, userId);
 
-        if (account is null) 
-            return NotFound(AccountDescriptions.AccountNonExistant);
-
-        if (account.UserId != userId)
-            return Forbid(WarningDescriptions.ForbiddenAccess);
-
-        if (uploadedFile is null)
-            return BadRequest("File not uploaded");
+        if (account is null) return NotFound(AccountDescriptions.AccountNonExistant);
+        if (account.UserId != userId) return Forbid(WarningDescriptions.ForbiddenAccess);
+        if (uploadedFile is null) return BadRequest("File not uploaded");
 
         string mime = MimeTypes.GetMimeType(uploadedFile.FileName);
 
-        if (!mime.Equals("application/pdf") && !mime.Equals("application/png"))
-            return BadRequest("Document can only be of .png or .pdf");
+        if (!mime.Equals("application/pdf") && !mime.Equals("application/png")) return BadRequest("Document can only be of .png or .pdf");
 
-        if (uploadedFile.Length > 2000000)
-            return BadRequest("File cannot be bigger than 2MB");
+        if (uploadedFile.Length > 2000000) return BadRequest("File cannot be bigger than 2MB");
 
         string rootDir = Directory.GetDirectoryRoot("OpenBank");
         string folderPath = string.Concat(rootDir, "ApiUserFiles\\", "Accounts\\", account.Id.ToString() + "\\", "Documents\\");
@@ -95,8 +87,7 @@ public class DocumentsController : Controller
 
                 var saved = await _documentServices.AddAsync(documentToInsert);
 
-                if (saved?.Id > 0)
-                    return Ok(_mapper.Map<Document, DocumentResponse>(saved));
+                if (saved?.Id > 0) return Ok(_mapper.Map<Document, DocumentResponse>(saved));
             }
 
             return Problem("Could not upload/create the file");
@@ -116,23 +107,18 @@ public class DocumentsController : Controller
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
         int userId = _tokenServices.GetUserIdFromToken(authToken);
 
-        if (userId <= 0)
-            return Unauthorized(AccountDescriptions.NotLoggedIn);
+        if (userId <= 0) return Unauthorized(AccountDescriptions.NotLoggedIn);
 
         Account? account = await _accountServices.GetAccountById(accountId, userId);
 
-        if (account is null)
-            return NotFound(AccountDescriptions.AccountNonExistant);
-
-        if (account.UserId != userId)
-            return Forbid(WarningDescriptions.ForbiddenAccess);
+        if (account is null) return NotFound(AccountDescriptions.AccountNonExistant);
+        if (account.UserId != userId) return Forbid(WarningDescriptions.ForbiddenAccess);
 
         try
         {
             List<Document> documents = await _documentServices.GetDocumentsAsync(accountId);
 
-            if (documents.Count <= 0)
-                return Ok(documents);
+            if (documents.Count <= 0) return Ok(documents);
 
             List<DocumentResponse> documentsDTO = new List<DocumentResponse>();
             documents.ForEach(doc => documentsDTO.Add(_mapper.Map<Document, DocumentResponse>(doc)));
@@ -155,27 +141,19 @@ public class DocumentsController : Controller
         string authToken = HttpContext.Request.Headers["Authorization"].ToString();
         int userId = _tokenServices.GetUserIdFromToken(authToken);
 
-        if (userId <= 0)
-            return Unauthorized(AccountDescriptions.NotLoggedIn);
+        if (userId <= 0) return Unauthorized(AccountDescriptions.NotLoggedIn);
 
         Account? account = await _accountServices.GetAccountById(accountId, userId);
 
-        if (account is null) 
-            return NotFound(AccountDescriptions.AccountNonExistant);
-
-        if (account.UserId != userId)
-            return Forbid(WarningDescriptions.ForbiddenAccess);
+        if (account is null) return NotFound(AccountDescriptions.AccountNonExistant);
+        if (account.UserId != userId) return Forbid(WarningDescriptions.ForbiddenAccess);
 
         try
         {
             Document? document = await _documentServices.GetDocumentAsync(docId);
 
-            if (document is null)
-                return Ok("Document not found");
-
-            if (!System.IO.File.Exists(document.Url))
-                return Problem("Document not found");
-
+            if (document is null) return Ok("Document not found");
+            if (!System.IO.File.Exists(document.Url)) return Problem("Document not found");
 
             return new FileStreamResult(System.IO.File.OpenRead(document.Url), document.ContentType)
             {
