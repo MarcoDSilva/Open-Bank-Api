@@ -1,13 +1,20 @@
+using System;
+using System.Runtime.InteropServices.ComTypes;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using OpenBank.Frontend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddHttpClient();
+
+// connection to openbank api
+builder.Services.AddScoped(
+    con => new HttpClient { BaseAddress = new Uri("https://localhost:7136/") }
+);
 
 var app = builder.Build();
 

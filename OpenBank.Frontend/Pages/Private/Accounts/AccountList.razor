@@ -1,7 +1,81 @@
 ﻿@page "/accounts/list"
 
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject IHttpClientFactory ClientFactory
+
 <h3>AccountList</h3>
 
+@if (apiError)
+{
+    <h4>Error while obtaining the data from the api</h4>
+}
+else
+{
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>User id</th>
+                <th>Created_at</th>
+                <th>Email</th>
+                <th>FullName</th>
+                <th>Password</th>
+                <th>UserName</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var element in users)
+            {
+                <tr>
+                    <td>@element.Id</td>
+                    <td>@element.Created_at</td>
+                    <td>@element.Email</td>
+                    <td>@element.FullName</td>
+                    <td>@element.Password</td>
+                    <td>@element.UserName</td>
+                </tr>
+            }
+        </tbody>
+
+        <button @onclick="() => GetUsers()"> clica </button>
+    </table>
+}
+
+
 @code {
+
+    private List<User> users = new List<User>();
+    private bool apiError = false;
+
+    protected async Task GetUsers()
+    {
+        var callApi = new HttpRequestMessage(HttpMethod.Get, "https://localhost:7136/api/users");
+        var client = ClientFactory.CreateClient();
+        var response = await client.SendAsync(callApi);
+
+        if (response.IsSuccessStatusCode)
+        {
+            await using var responseStream = await response.Content.ReadAsStreamAsync();
+
+            users = await JsonSerializer.DeserializeAsync<List<User>>(responseStream);
+            System.Console.WriteLine("eu + " + users[1]);
+        }
+        else
+        {
+            System.Console.WriteLine("error");
+        }
+    }
+
+    public class User
+    {
+        public int Id { get; set; }
+        public DateTime Created_at { get; set; }
+        public string Email { get; set; }
+        public string FullName { get; set; }
+        public string Password { get; set; }
+        public string UserName { get; set; }
+    }
 
 }
