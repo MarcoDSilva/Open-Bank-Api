@@ -1,6 +1,6 @@
 ﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">OpenBank.Frontend</a>
+        <a class="navbar-brand" href="">OpenBank Web</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -10,24 +10,60 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+            <NavLink class="nav-link" href="" @onclick="() => ToggleMenuOptions(menuOptions.Home)">
+                <iconify-icon icon="material-symbols:home-outline"></iconify-icon>
+                <span aria-hidden="true">&nbsp Home</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            <NavLink class="nav-link" href="" @onclick="() => ToggleMenuOptions(menuOptions.Accounts)">
+                <iconify-icon icon="material-symbols:account-balance"></iconify-icon>
+                <span aria-hidden="true">&nbsp Accounts</span>
             </NavLink>
+
+            @if (submenuSelected == menuOptions.Accounts)
+            {
+                <li>
+                    <NavLink class="nav-link" href="/accounts/list">
+                        <iconify-icon icon="material-symbols:list-alt-outline"></iconify-icon>
+                        <span aria-hidden="true">&nbsp List Accounts</span>
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink class="nav-link" href="/accounts/create">
+                        <iconify-icon icon="material-symbols:playlist-add"></iconify-icon>
+                        <span aria-hidden="true">&nbsp Create Account</span>
+                    </NavLink>
+                </li>
+            }
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            <NavLink class="nav-link" href="" @onclick="() => ToggleMenuOptions(menuOptions.Transfers)">
+                <iconify-icon icon="mdi:bank-transfer"></iconify-icon>
+                <span aria-hidden="true">&nbsp Transfers</span>
             </NavLink>
+
+            @if (submenuSelected == menuOptions.Transfers)
+            {
+                <NavLink class="nav-link" href="/transfers/movements">
+                    <iconify-icon icon="mdi:bank-transfer-out"></iconify-icon>
+                    <span>&nbsp Bank Transfer</span>
+                </NavLink>
+            }
         </div>
     </nav>
 </div>
 
 @code {
+    private enum menuOptions
+    {
+        None,
+        Home,
+        Accounts,
+        Transfers
+    };
+
+
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
@@ -35,5 +71,13 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    // child elements
+    private menuOptions submenuSelected = menuOptions.None;
+
+    private void ToggleMenuOptions(menuOptions option)
+    {
+        submenuSelected = option;
     }
 }
