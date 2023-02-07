@@ -13,7 +13,7 @@ builder.Services.AddHttpClient();
 
 // connection to openbank api
 builder.Services.AddScoped(
-    con => new HttpClient { BaseAddress = new Uri("https://localhost:7136/") }
+    con => new HttpClient { BaseAddress = new Uri("https://localhost:7136/api/") }
 );
 
 var app = builder.Build();

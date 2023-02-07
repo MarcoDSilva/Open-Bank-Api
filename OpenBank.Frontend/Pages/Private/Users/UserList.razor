@@ -1,0 +1,47 @@
+﻿@page "/users/list"
+
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject HttpClient Http
+
+<h3>User List</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>User id</th>
+            <th>Created_at</th>
+            <th>Email</th>
+            <th>FullName</th>
+            <th>Password</th>
+            <th>UserName</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var element in users)
+        {
+            <tr>
+                <td>@element.Id</td>
+                <td>@element.Created_at</td>
+                <td>@element.Email</td>
+                <td>@element.FullName</td>
+                <td>@element.Password</td>
+                <td>@element.UserName</td>
+            </tr>
+        }
+    </tbody>
+    <button @onclick="() => GetUsers()"> clica </button>
+</table>
+
+
+
+@code {
+
+    private List<User> users = new List<User>();
+    private bool apiError = false;
+
+    protected async Task GetUsers()
+    {
+        users = await Http.GetFromJsonAsync<List<User>>("users");      
+    }
+}
