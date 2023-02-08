@@ -4,7 +4,10 @@
 @using System.Text.Json
 @using System.Text.Json.Serialization
 @inject HttpClient Http
+@inject NavigationManager NavManager
 @using Newtonsoft.Json
+
+
 
 <section class="vh-100">
     <div class="container-fluid">
@@ -73,16 +76,18 @@
 
         if (string.IsNullOrWhiteSpace(loginRequest.password) || string.IsNullOrWhiteSpace(loginRequest.username) ||
         loginRequest.password.Count() < 8 || loginRequest.username.Count() <= 8)
-            return;        
-
-        var jsonRequest = JsonConvert.SerializeObject(loginRequest);
+            return;
 
         var jsonResponse = await Http.PostAsJsonAsync<LoginRequest>("users/login", loginRequest);
-        LoginResponse loginResponse = JsonConvert.DeserializeObject<LoginResponse>(jsonResponse.Content.ReadAsStringAsync().Result);
 
-        System.Console.WriteLine(loginResponse.AcessToken);
+        if (jsonResponse.IsSuccessStatusCode)
+        {
+            var loginResponse = JsonConvert.DeserializeObject<LoginResponse>(jsonResponse.Content.ReadAsStringAsync().Result);
+
+            // create cookie with token
+            
+            // redirect to main page
+            NavManager.NavigateTo("/");
+        }
     }
-
-
-
 }
