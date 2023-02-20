@@ -1,5 +1,19 @@
 ﻿@page "/"
+@inject NavigationManager NavManager
+
+
+@if (!isUserValid)
+{
+    NavManager.NavigateTo("/login");
+}
 
 <PageTitle>OpenBank Web</PageTitle>
 
 <h1>Welcome to OpenBank Web.</h1>
+
+
+@code
+{
+    bool isUserValid = false;
+
+}

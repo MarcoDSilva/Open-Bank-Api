@@ -1,7 +1,15 @@
 ﻿@page "/accounts/create"
 
+@inject NavigationManager NavManager
+
+@if (!isUserValid)
+{
+    NavManager.NavigateTo("/login");
+}
+
 <h3>AccountCreation</h3>
 
-@code {
-
+@code
+{
+    bool isUserValid = false;
 }

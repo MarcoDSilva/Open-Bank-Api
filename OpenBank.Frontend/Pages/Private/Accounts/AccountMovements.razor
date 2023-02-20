@@ -1,7 +1,14 @@
 ﻿@page "/accounts/movements"
+@inject NavigationManager NavManager
+
+@if (!isUserValid)
+{
+    NavManager.NavigateTo("/login");
+}
 
 <h3>AccountMovements</h3>
 
-@code {
-
+@code
+{
+    bool isUserValid = false;
 }

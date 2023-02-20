@@ -3,11 +3,9 @@
 
 @using System.Text.Json
 @using System.Text.Json.Serialization
+@using Newtonsoft.Json
 @inject HttpClient Http
 @inject NavigationManager NavManager
-@using Newtonsoft.Json
-
-
 
 <section class="vh-100">
     <div class="container-fluid">
@@ -74,9 +72,7 @@
     {
         System.Console.WriteLine("validation submit");
 
-        if (string.IsNullOrWhiteSpace(loginRequest.password) || string.IsNullOrWhiteSpace(loginRequest.username) ||
-        loginRequest.password.Count() < 8 || loginRequest.username.Count() <= 8)
-            return;
+        if (ValidateFields()) return;
 
         var jsonResponse = await Http.PostAsJsonAsync<LoginRequest>("users/login", loginRequest);
 
@@ -84,10 +80,20 @@
         {
             var loginResponse = JsonConvert.DeserializeObject<LoginResponse>(jsonResponse.Content.ReadAsStringAsync().Result);
 
-            // create cookie with token
-            
+            // create token on localstorage
             // redirect to main page
             NavManager.NavigateTo("/");
         }
+        // error bool to true, to launch the error notification
+    }
+
+    private bool ValidateFields()
+    {
+        var areFieldsEmpty = string.IsNullOrWhiteSpace(loginRequest.password) ||
+                                string.IsNullOrWhiteSpace(loginRequest.username);
+
+        var isFieldLengthValid = loginRequest.password.Count() < 8 || loginRequest.username.Count() < 8;
+
+        return areFieldsEmpty || isFieldLengthValid;
     }
 }
